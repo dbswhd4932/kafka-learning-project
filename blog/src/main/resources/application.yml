@@ -1,1 +1,16 @@
-spring.application.name=blog
+server:
+  port: 8080
+
+spring:
+  application:
+    name: blog
+  kafka:
+    bootstrap-servers: localhost:9092 # 카프카 서버 주소
+    consumer:
+      group-id: my-group # 컨슈머 그룹 ID
+      auto-offset-reset: earliest # 오프셋 초기화 정책
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
