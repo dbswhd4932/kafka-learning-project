@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: optimistic-lock-example
+
+  # H2 데이터베이스 설정
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # H2 콘솔 활성화
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: create  # 애플리케이션 시작 시 테이블 생성
+    show-sql: true      # SQL 쿼리 로그 출력
+    properties:
+      hibernate:
+        format_sql: true  # SQL 포맷팅
+        use_sql_comments: true  # SQL에 주석 추가
+        highlight_sql: true     # SQL 하이라이트
+        # 낙관적 락 관련 설정
+        jdbc:
+          batch_size: 10
+        order_inserts: true
+        order_updates: true
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.example.optimisticlock: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # 쿼리 파라미터 로깅
+    org.hibernate.orm.jdbc.bind: TRACE
+
+# 서버 설정
+server:
+  port: 8080
