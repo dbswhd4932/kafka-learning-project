@@ -1,0 +1,115 @@
+spring:
+  application:
+    name: rabbitmq-tutorial
+
+  # RabbitMQ 설정
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # Virtual Host 설정
+    virtual-host: /
+    # Connection Factory 설정
+    connection-timeout: 15000
+    # Publisher Confirms (메시지 전송 확인)
+    publisher-confirm-type: correlated
+    # Publisher Returns (라우팅 실패 메시지 반환)
+    publisher-returns: true
+    # Template 설정
+    template:
+      mandatory: true
+      receive-timeout: 5000
+    # Listener Container 설정
+    listener:
+      simple:
+        # Consumer 동시성 설정
+        concurrency: 3
+        max-concurrency: 10
+        # 메시지 재시도 설정
+        retry:
+          enabled: true
+          initial-interval: 3000
+          max-attempts: 3
+          multiplier: 2.0
+        # Acknowledge 모드 (AUTO, MANUAL, NONE)
+        acknowledge-mode: auto
+        # Prefetch Count (한 번에 가져올 메시지 수)
+        prefetch: 10
+
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  # H2 Database 설정 (개발/테스트용)
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # H2 Console 활성화
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# Logging 설정
+logging:
+  level:
+    root: INFO
+    com.example.rabbitmq: DEBUG
+    org.springframework.amqp: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Server 설정
+server:
+  port: 8080
+
+# 애플리케이션 설정
+app:
+  rabbitmq:
+    # Step 1: 기본 메시지 큐
+    basic:
+      queue-name: basic.queue
+      exchange-name: basic.exchange
+      routing-key: basic.routing.key
+    # Step 2: Transaction 처리
+    transaction:
+      queue-name: transaction.queue
+      exchange-name: transaction.exchange
+      routing-key: transaction.routing.key
+    # Step 3: Routing Model
+    routing:
+      direct:
+        exchange-name: direct.exchange
+      topic:
+        exchange-name: topic.exchange
+      fanout:
+        exchange-name: fanout.exchange
+    # Step 4: Pub/Sub 알람 시스템
+    notification:
+      exchange-name: notification.fanout
+      email-queue: notification.email.queue
+      sms-queue: notification.sms.queue
+      push-queue: notification.push.queue
+    # Step 5: Logging System
+    logging:
+      exchange-name: logging.topic
+      error-queue: logging.error.queue
+      warn-queue: logging.warn.queue
+      info-queue: logging.info.queue
+      all-queue: logging.all.queue
+    # Step 6: Dead Letter Queue
+    dlq:
+      main-queue: main.queue
+      dlq-queue: dlq.queue
+      dlq-exchange: dlq.exchange
+      parking-lot-queue: parking.lot.queue
