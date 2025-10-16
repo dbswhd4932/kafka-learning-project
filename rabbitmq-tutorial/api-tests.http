@@ -1,0 +1,453 @@
+###############################################################################
+# RabbitMQ Tutorial - 전체 API 테스트 파일
+#
+# 사용 방법:
+# 1. RabbitMQ가 실행 중인지 확인 (docker-compose up -d)
+# 2. 애플리케이션 실행 (./gradlew bootRun)
+# 3. 각 요청 옆의 실행 버튼 클릭 또는 Ctrl+Enter (IntelliJ/VS Code)
+# 4. 콘솔에서 로그 확인
+#
+# 권장 테스트 순서: Step 1 → Step 2 → Step 3 → Step 4 → Step 5 → Step 6
+###############################################################################
+
+###############################################################################
+# Step 1: 기본 메시지 전송/수신
+# - RabbitMQ의 기본 개념 학습
+# - Producer/Consumer 패턴 이해
+###############################################################################
+
+### 1-1. Step 1 헬스 체크
+GET http://localhost:8080/api/v1/basic/health
+
+### 1-2. 간단한 텍스트 메시지 전송
+POST http://localhost:8080/api/v1/basic/send/simple?content=첫번째메시지&sender=홍길동
+
+### 1-3. JSON 메시지 전송 - 기본
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "안녕하세요, RabbitMQ 튜토리얼입니다!",
+  "sender": "김개발"
+}
+
+### 1-4. JSON 메시지 전송 - 여러 개
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "첫 번째 주문이 들어왔습니다.",
+  "sender": "주문시스템"
+}
+
+###
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "두 번째 주문이 들어왔습니다.",
+  "sender": "주문시스템"
+}
+
+###
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "결제가 완료되었습니다.",
+  "sender": "결제시스템"
+}
+
+###############################################################################
+# Step 2: DB 연동과 Transaction 처리
+# - JPA와 RabbitMQ 통합
+# - 트랜잭션 처리 방법 학습
+###############################################################################
+
+### 2-1. Step 2 헬스 체크
+GET http://localhost:8080/api/v1/transaction/health
+
+### 2-2. 주문 생성 - Laptop
+POST http://localhost:8080/api/v1/transaction/orders
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD-001",
+  "customerId": "CUST-001",
+  "productName": "Laptop",
+  "quantity": 1,
+  "price": 1500000
+}
+
+### 2-3. 주문 생성 - Smartphone
+POST http://localhost:8080/api/v1/transaction/orders
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD-002",
+  "customerId": "CUST-002",
+  "productName": "Smartphone",
+  "quantity": 2,
+  "price": 1200000
+}
+
+### 2-4. 주문 생성 - Tablet
+POST http://localhost:8080/api/v1/transaction/orders
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD-003",
+  "customerId": "CUST-001",
+  "productName": "Tablet",
+  "quantity": 1,
+  "price": 800000
+}
+
+### 2-5. 주문 조회 - ORD-001
+GET http://localhost:8080/api/v1/transaction/orders/ORD-001
+
+### 2-6. 주문 조회 - ORD-002
+GET http://localhost:8080/api/v1/transaction/orders/ORD-002
+
+### 2-7. 주문 상태 업데이트 - COMPLETED
+PUT http://localhost:8080/api/v1/transaction/orders/ORD-001/status?status=COMPLETED
+
+### 2-8. 주문 상태 업데이트 - PROCESSING
+PUT http://localhost:8080/api/v1/transaction/orders/ORD-002/status?status=PROCESSING
+
+### 2-9. 주문 상태 업데이트 - FAILED
+PUT http://localhost:8080/api/v1/transaction/orders/ORD-003/status?status=FAILED
+
+###############################################################################
+# Step 3: Exchange와 Routing Model
+# - Direct, Topic, Fanout Exchange 학습
+# - 라우팅 패턴 이해
+###############################################################################
+
+### 3-1. Step 3 헬스 체크
+GET http://localhost:8080/api/v1/routing/health
+
+### ===== Direct Exchange 테스트 =====
+
+### 3-2. Direct Exchange - High Priority (긴급 작업)
+POST http://localhost:8080/api/v1/routing/direct?routingKey=high&content=긴급작업-시스템장애발생
+
+### 3-3. Direct Exchange - Medium Priority (일반 작업)
+POST http://localhost:8080/api/v1/routing/direct?routingKey=medium&content=일반작업-데이터동기화
+
+### 3-4. Direct Exchange - Low Priority (낮은 우선순위)
+POST http://localhost:8080/api/v1/routing/direct?routingKey=low&content=배치작업-통계집계
+
+### ===== Topic Exchange 테스트 =====
+
+### 3-5. Topic Exchange - order.created (order.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=order.created&content=신규주문생성-ORD-004
+
+### 3-6. Topic Exchange - order.updated (order.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=order.updated&content=주문정보변경-ORD-001
+
+### 3-7. Topic Exchange - order.deleted (order.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=order.deleted&content=주문취소-ORD-003
+
+### 3-8. Topic Exchange - order.payment.completed (order.* + *.payment.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=order.payment.completed&content=주문결제완료-1500000원
+
+### 3-9. Topic Exchange - user.payment.failed (*.payment.* 패턴만 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=user.payment.failed&content=사용자결제실패-카드한도초과
+
+### 3-10. Topic Exchange - product.created (# 패턴만 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=product.created&content=신규상품등록-iPhone15
+
+### ===== Fanout Exchange 테스트 =====
+
+### 3-11. Fanout Exchange - 전체 브로드캐스트
+POST http://localhost:8080/api/v1/routing/fanout?content=전체공지-시스템점검예정(2024-01-01 02:00-04:00)
+
+### 3-12. Fanout Exchange - 긴급 공지
+POST http://localhost:8080/api/v1/routing/fanout?content=긴급공지-보안업데이트필수
+
+###############################################################################
+# Step 4: Pub/Sub 실시간 알람 시스템
+# - Fanout Exchange를 활용한 Pub/Sub 패턴
+# - 이메일, SMS, 푸시 알림 동시 전송
+###############################################################################
+
+### 4-1. Step 4 헬스 체크
+GET http://localhost:8080/api/v1/notifications/health
+
+### 4-2. 주문 생성 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "ORDER_CREATED",
+  "recipientId": "USER001",
+  "title": "주문이 접수되었습니다",
+  "content": "주문번호 ORD-001이 성공적으로 접수되었습니다."
+}
+
+### 4-3. 주문 완료 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "ORDER_COMPLETED",
+  "recipientId": "USER002",
+  "title": "주문이 완료되었습니다",
+  "content": "주문번호 ORD-002가 성공적으로 처리되었습니다."
+}
+
+### 4-4. 결제 성공 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "PAYMENT_SUCCESS",
+  "recipientId": "USER003",
+  "title": "결제가 완료되었습니다",
+  "content": "1,500,000원이 정상적으로 결제되었습니다. 카드: **** **** **** 1234"
+}
+
+### 4-5. 결제 실패 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "PAYMENT_FAILED",
+  "recipientId": "USER004",
+  "title": "결제에 실패했습니다",
+  "content": "카드 한도 초과로 결제가 실패했습니다. 다른 결제 수단을 이용해주세요."
+}
+
+### 4-6. 배송 시작 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "SHIPPING_STARTED",
+  "recipientId": "USER005",
+  "title": "배송이 시작되었습니다",
+  "content": "주문하신 상품이 배송 중입니다. 운송장번호: 1234567890 (CJ대한통운)"
+}
+
+### 4-7. 배송 완료 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "SHIPPING_COMPLETED",
+  "recipientId": "USER006",
+  "title": "배송이 완료되었습니다",
+  "content": "상품이 정상적으로 배송 완료되었습니다. 감사합니다!"
+}
+
+### 4-8. 시스템 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "SYSTEM_ALERT",
+  "recipientId": "ALL",
+  "title": "시스템 점검 안내",
+  "content": "2024년 1월 1일 02:00 ~ 04:00 시스템 점검이 예정되어 있습니다. 서비스 이용에 불편을 드려 죄송합니다."
+}
+
+### 4-9. 간단한 알림 전송 (Query String 방식)
+POST http://localhost:8080/api/v1/notifications/simple?type=ORDER_CREATED&recipientId=USER007&title=신규주문&content=주문이접수되었습니다
+
+###############################################################################
+# Step 5: Routing Model을 활용한 Log 수집
+# - Topic Exchange를 활용한 로그 라우팅
+# - 로그 레벨별 필터링
+###############################################################################
+
+### 5-1. Step 5 헬스 체크
+GET http://localhost:8080/api/v1/logs/health
+
+### ===== Error 로그 테스트 =====
+
+### 5-2. OrderService - Error
+POST http://localhost:8080/api/v1/logs/error?serviceName=OrderService&message=주문처리중데이터베이스연결실패
+
+### 5-3. PaymentService - Error
+POST http://localhost:8080/api/v1/logs/error?serviceName=PaymentService&message=결제게이트웨이API호출실패-Timeout
+
+### 5-4. UserService - Error
+POST http://localhost:8080/api/v1/logs/error?serviceName=UserService&message=사용자인증실패-InvalidToken
+
+### 5-5. DatabaseService - Error
+POST http://localhost:8080/api/v1/logs/error?serviceName=DatabaseService&message=쿼리실행오류-DeadlockDetected
+
+### ===== Warn 로그 테스트 =====
+
+### 5-6. OrderService - Warn
+POST http://localhost:8080/api/v1/logs/warn?serviceName=OrderService&message=주문처리지연발생-5초초과
+
+### 5-7. PaymentService - Warn
+POST http://localhost:8080/api/v1/logs/warn?serviceName=PaymentService&message=결제응답시간초과-3초
+
+### 5-8. InventoryService - Warn
+POST http://localhost:8080/api/v1/logs/warn?serviceName=InventoryService&message=재고부족경고-10개미만
+
+### 5-9. CacheService - Warn
+POST http://localhost:8080/api/v1/logs/warn?serviceName=CacheService&message=캐시적중률저하-50%이하
+
+### ===== Info 로그 테스트 =====
+
+### 5-10. OrderService - Info
+POST http://localhost:8080/api/v1/logs/info?serviceName=OrderService&message=주문처리완료-ORD-001
+
+### 5-11. PaymentService - Info
+POST http://localhost:8080/api/v1/logs/info?serviceName=PaymentService&message=결제처리완료-1500000원
+
+### 5-12. ShippingService - Info
+POST http://localhost:8080/api/v1/logs/info?serviceName=ShippingService&message=배송시작-운송장번호1234567890
+
+### 5-13. NotificationService - Info
+POST http://localhost:8080/api/v1/logs/info?serviceName=NotificationService&message=알림전송완료-이메일+SMS+푸시
+
+### ===== JSON 방식 상세 로그 =====
+
+### 5-14. Error 로그 - 상세 정보 포함
+POST http://localhost:8080/api/v1/logs
+Content-Type: application/json
+
+{
+  "level": "ERROR",
+  "serviceName": "DatabaseService",
+  "message": "데이터베이스 연결 풀 고갈",
+  "additionalInfo": "Max pool size: 10, Active: 10, Idle: 0, Waiting: 5"
+}
+
+### 5-15. Warn 로그 - 상세 정보 포함
+POST http://localhost:8080/api/v1/logs
+Content-Type: application/json
+
+{
+  "level": "WARN",
+  "serviceName": "APIService",
+  "message": "외부 API 응답 지연",
+  "additionalInfo": "Response time: 5230ms, Threshold: 3000ms"
+}
+
+###############################################################################
+# Step 6: Dead Letter Queue와 Retry 재처리
+# - DLQ(Dead Letter Queue) 설정
+# - 실패한 메시지 재처리
+# - Parking Lot 패턴
+###############################################################################
+
+### 6-1. Step 6 헬스 체크
+GET http://localhost:8080/api/v1/dlq/health
+
+### 6-2. DLQ 정보 조회
+GET http://localhost:8080/api/v1/dlq/info
+
+### ===== 성공 케이스 테스트 =====
+
+### 6-3. 정상 작업 1
+POST http://localhost:8080/api/v1/dlq/task/success?content=정상작업-데이터동기화
+
+### 6-4. 정상 작업 2
+POST http://localhost:8080/api/v1/dlq/task/success?content=정상작업-통계집계
+
+### 6-5. 정상 작업 3
+POST http://localhost:8080/api/v1/dlq/task/success?content=정상작업-배치처리
+
+### ===== 실패 케이스 테스트 (DLQ로 이동) =====
+### 주의: 이 작업들은 의도적으로 실패하여 재시도 후 DLQ로 이동합니다
+
+### 6-6. 실패 작업 1 - 외부 API 호출 실패 시뮬레이션
+# 3번 재시도 후 DLQ로 이동 → DLQ Consumer가 재처리 시도 → 최종 실패 시 Parking Lot으로 이동
+POST http://localhost:8080/api/v1/dlq/task/fail?content=외부API호출작업-연결실패
+
+### 6-7. 실패 작업 2 - 데이터 처리 오류 시뮬레이션
+POST http://localhost:8080/api/v1/dlq/task/fail?content=데이터검증실패-형식오류
+
+### 6-8. 실패 작업 3 - 리소스 부족 시뮬레이션
+POST http://localhost:8080/api/v1/dlq/task/fail?content=메모리부족-처리불가
+
+### ===== JSON 방식 작업 전송 =====
+
+### 6-9. 성공 작업 (JSON)
+POST http://localhost:8080/api/v1/dlq/task
+Content-Type: application/json
+
+{
+  "taskContent": "대용량 파일 업로드 작업",
+  "shouldFail": false
+}
+
+### 6-10. 실패 작업 (JSON)
+POST http://localhost:8080/api/v1/dlq/task
+Content-Type: application/json
+
+{
+  "taskContent": "결제 처리 작업 - 게이트웨이 오류",
+  "shouldFail": true
+}
+
+### ===== 연속 작업 테스트 (성공/실패 혼합) =====
+
+### 6-11. 혼합 테스트 1 - 성공
+POST http://localhost:8080/api/v1/dlq/task/success?content=작업1-성공
+
+### 6-12. 혼합 테스트 2 - 성공
+POST http://localhost:8080/api/v1/dlq/task/success?content=작업2-성공
+
+### 6-13. 혼합 테스트 3 - 실패
+POST http://localhost:8080/api/v1/dlq/task/fail?content=작업3-실패
+
+### 6-14. 혼합 테스트 4 - 성공
+POST http://localhost:8080/api/v1/dlq/task/success?content=작업4-성공
+
+### 6-15. 혼합 테스트 5 - 실패
+POST http://localhost:8080/api/v1/dlq/task/fail?content=작업5-실패
+
+###############################################################################
+# 추가 테스트 시나리오
+###############################################################################
+
+### 부하 테스트 - 여러 메시지 연속 전송
+### (아래 요청들을 빠르게 연속 실행하여 부하 테스트)
+
+### 부하-1. 기본 메시지 10개 전송
+POST http://localhost:8080/api/v1/basic/send/simple?content=부하테스트1&sender=load-test
+
+###
+POST http://localhost:8080/api/v1/basic/send/simple?content=부하테스트2&sender=load-test
+
+###
+POST http://localhost:8080/api/v1/basic/send/simple?content=부하테스트3&sender=load-test
+
+###
+POST http://localhost:8080/api/v1/basic/send/simple?content=부하테스트4&sender=load-test
+
+###
+POST http://localhost:8080/api/v1/basic/send/simple?content=부하테스트5&sender=load-test
+
+### 부하-2. Fanout 브로드캐스트 여러 번
+POST http://localhost:8080/api/v1/routing/fanout?content=브로드캐스트1
+
+###
+POST http://localhost:8080/api/v1/routing/fanout?content=브로드캐스트2
+
+###
+POST http://localhost:8080/api/v1/routing/fanout?content=브로드캐스트3
+
+###############################################################################
+# 테스트 완료
+#
+# 확인 사항:
+# 1. 애플리케이션 콘솔에서 로그 확인
+# 2. RabbitMQ Management UI (http://localhost:15672)에서 Queue 상태 확인
+# 3. H2 Console (http://localhost:8080/h2-console)에서 DB 데이터 확인
+#
+# 학습 포인트:
+# - Step 1: Producer/Consumer 기본 패턴
+# - Step 2: DB Transaction과 메시지 큐 통합
+# - Step 3: Exchange 타입별 라우팅 차이
+# - Step 4: Pub/Sub 패턴으로 여러 채널 동시 전송
+# - Step 5: Topic Exchange로 로그 레벨별 분리
+# - Step 6: DLQ와 재시도 메커니즘
+###############################################################################
