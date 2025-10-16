@@ -1,0 +1,43 @@
+### Step 1: 기본 메시지 전송/수신 테스트
+
+### 1. 헬스 체크
+GET http://localhost:8080/api/v1/basic/health
+
+### 2. 간단한 텍스트 메시지 전송
+POST http://localhost:8080/api/v1/basic/send/simple?content=Hello RabbitMQ!&sender=user1
+
+### 3. JSON 메시지 전송
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "안녕하세요, RabbitMQ 테스트입니다!",
+  "sender": "홍길동"
+}
+
+### 4. 여러 메시지 연속 전송
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "첫 번째 메시지",
+  "sender": "user1"
+}
+
+###
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "두 번째 메시지",
+  "sender": "user2"
+}
+
+###
+POST http://localhost:8080/api/v1/basic/send
+Content-Type: application/json
+
+{
+  "content": "세 번째 메시지",
+  "sender": "user3"
+}

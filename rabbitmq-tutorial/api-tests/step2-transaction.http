@@ -1,0 +1,52 @@
+### Step 2: DB 연동과 Transaction 처리 테스트
+
+### 1. 헬스 체크
+GET http://localhost:8080/api/v1/transaction/health
+
+### 2. 주문 생성 - Laptop
+POST http://localhost:8080/api/v1/transaction/orders
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD-001",
+  "customerId": "CUST-001",
+  "productName": "Laptop",
+  "quantity": 1,
+  "price": 1500000
+}
+
+### 3. 주문 생성 - Smartphone
+POST http://localhost:8080/api/v1/transaction/orders
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD-002",
+  "customerId": "CUST-002",
+  "productName": "Smartphone",
+  "quantity": 2,
+  "price": 1200000
+}
+
+### 4. 주문 조회 - ORD-001
+GET http://localhost:8080/api/v1/transaction/orders/ORD-001
+
+### 5. 주문 조회 - ORD-002
+GET http://localhost:8080/api/v1/transaction/orders/ORD-002
+
+### 6. 주문 상태 업데이트 - COMPLETED
+PUT http://localhost:8080/api/v1/transaction/orders/ORD-001/status?status=COMPLETED
+
+### 7. 주문 상태 업데이트 - PROCESSING
+PUT http://localhost:8080/api/v1/transaction/orders/ORD-002/status?status=PROCESSING
+
+### 8. 여러 주문 생성
+POST http://localhost:8080/api/v1/transaction/orders
+Content-Type: application/json
+
+{
+  "orderNumber": "ORD-003",
+  "customerId": "CUST-001",
+  "productName": "Tablet",
+  "quantity": 1,
+  "price": 800000
+}

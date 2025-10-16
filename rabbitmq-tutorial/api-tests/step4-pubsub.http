@@ -1,0 +1,62 @@
+### Step 4: Pub/Sub 실시간 알람 시스템 테스트
+
+### 1. 헬스 체크
+GET http://localhost:8080/api/v1/notifications/health
+
+### 2. 주문 완료 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "ORDER_COMPLETED",
+  "recipientId": "USER001",
+  "title": "주문이 완료되었습니다",
+  "content": "주문번호 ORD-001이 성공적으로 처리되었습니다."
+}
+
+### 3. 결제 성공 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "PAYMENT_SUCCESS",
+  "recipientId": "USER002",
+  "title": "결제가 완료되었습니다",
+  "content": "1,500,000원이 정상적으로 결제되었습니다."
+}
+
+### 4. 배송 시작 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "SHIPPING_STARTED",
+  "recipientId": "USER003",
+  "title": "배송이 시작되었습니다",
+  "content": "주문하신 상품이 배송 중입니다. 운송장번호: 1234567890"
+}
+
+### 5. 시스템 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "SYSTEM_ALERT",
+  "recipientId": "ALL",
+  "title": "시스템 점검 안내",
+  "content": "2024년 1월 1일 02:00 ~ 04:00 시스템 점검이 예정되어 있습니다."
+}
+
+### 6. 간단한 알림 (Query String 방식)
+POST http://localhost:8080/api/v1/notifications/simple?type=ORDER_CREATED&recipientId=USER001&title=새로운%20주문&content=주문이%20접수되었습니다
+
+### 7. 결제 실패 알림
+POST http://localhost:8080/api/v1/notifications
+Content-Type: application/json
+
+{
+  "type": "PAYMENT_FAILED",
+  "recipientId": "USER004",
+  "title": "결제 실패",
+  "content": "카드 한도 초과로 결제가 실패했습니다. 다른 결제 수단을 이용해주세요."
+}

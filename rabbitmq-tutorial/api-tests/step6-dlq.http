@@ -1,0 +1,67 @@
+### Step 6: Dead Letter Queue와 Retry 재처리 테스트
+
+### 1. 헬스 체크
+GET http://localhost:8080/api/v1/dlq/health
+
+### 2. DLQ 정보 조회
+GET http://localhost:8080/api/v1/dlq/info
+
+### ===== 성공 케이스 테스트 =====
+
+### 3. 정상 작업 전송 (성공)
+POST http://localhost:8080/api/v1/dlq/task/success?content=정상%20작업%20처리
+
+### 4. 또 다른 정상 작업
+POST http://localhost:8080/api/v1/dlq/task/success?content=데이터%20동기화%20작업
+
+### ===== 실패 케이스 테스트 (DLQ로 이동) =====
+
+### 5. 실패 작업 전송 (DLQ 테스트)
+# 이 작업은 의도적으로 실패하여 3번 재시도 후 DLQ로 이동합니다
+POST http://localhost:8080/api/v1/dlq/task/fail?content=실패%20테스트%20작업
+
+### 6. 또 다른 실패 작업
+POST http://localhost:8080/api/v1/dlq/task/fail?content=오류%20발생%20시뮬레이션
+
+### ===== 커스텀 작업 테스트 =====
+
+### 7. 성공 작업 (JSON)
+POST http://localhost:8080/api/v1/dlq/task
+Content-Type: application/json
+
+{
+  "taskContent": "데이터 백업 작업",
+  "shouldFail": false
+}
+
+### 8. 실패 작업 (JSON)
+POST http://localhost:8080/api/v1/dlq/task
+Content-Type: application/json
+
+{
+  "taskContent": "외부 API 호출 작업",
+  "shouldFail": true
+}
+
+### 9. 여러 작업 연속 전송
+POST http://localhost:8080/api/v1/dlq/task/success?content=작업1
+
+###
+POST http://localhost:8080/api/v1/dlq/task/success?content=작업2
+
+###
+POST http://localhost:8080/api/v1/dlq/task/fail?content=실패작업1
+
+###
+POST http://localhost:8080/api/v1/dlq/task/success?content=작업3
+
+###
+POST http://localhost:8080/api/v1/dlq/task/fail?content=실패작업2
+
+### 테스트 시나리오:
+# 1. 실패 작업을 전송하면 Main Queue에서 처리 시도
+# 2. 처리 실패 후 application.yml 설정에 따라 3번 재시도
+# 3. 3번 모두 실패하면 자동으로 DLQ로 이동
+# 4. DLQ Consumer가 메시지를 수신하여 재처리 시도
+# 5. DLQ에서도 3번 재시도 후 실패하면 Parking Lot으로 이동
+# 6. Parking Lot에서 수동 처리 대기

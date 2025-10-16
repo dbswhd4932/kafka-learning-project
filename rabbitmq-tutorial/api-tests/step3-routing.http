@@ -1,0 +1,37 @@
+### Step 3: Exchange와 Routing Model 테스트
+
+### 1. 헬스 체크
+GET http://localhost:8080/api/v1/routing/health
+
+### ===== Direct Exchange 테스트 =====
+
+### 2. Direct Exchange - High Priority
+POST http://localhost:8080/api/v1/routing/direct?routingKey=high&content=긴급%20작업%20처리
+
+### 3. Direct Exchange - Medium Priority
+POST http://localhost:8080/api/v1/routing/direct?routingKey=medium&content=일반%20작업%20처리
+
+### 4. Direct Exchange - Low Priority
+POST http://localhost:8080/api/v1/routing/direct?routingKey=low&content=낮은%20우선순위%20작업
+
+### ===== Topic Exchange 테스트 =====
+
+### 5. Topic Exchange - order.created (order.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=order.created&content=주문%20생성됨
+
+### 6. Topic Exchange - order.updated (order.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=order.updated&content=주문%20업데이트됨
+
+### 7. Topic Exchange - order.payment.completed (*.payment.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=order.payment.completed&content=주문%20결제%20완료
+
+### 8. Topic Exchange - user.payment.failed (*.payment.* 패턴 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=user.payment.failed&content=사용자%20결제%20실패
+
+### 9. Topic Exchange - product.created (# 패턴만 매칭)
+POST http://localhost:8080/api/v1/routing/topic?routingKey=product.created&content=상품%20생성됨
+
+### ===== Fanout Exchange 테스트 =====
+
+### 10. Fanout Exchange - 브로드캐스트
+POST http://localhost:8080/api/v1/routing/fanout?content=전체%20알림%20-%20시스템%20점검%20예정

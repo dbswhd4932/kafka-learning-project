@@ -1,0 +1,61 @@
+### Step 5: Routing Model을 활용한 Log 수집 테스트
+
+### 1. 헬스 체크
+GET http://localhost:8080/api/v1/logs/health
+
+### ===== Error 로그 =====
+
+### 2. OrderService - Error
+POST http://localhost:8080/api/v1/logs/error?serviceName=OrderService&message=주문%20처리%20중%20오류%20발생
+
+### 3. PaymentService - Error
+POST http://localhost:8080/api/v1/logs/error?serviceName=PaymentService&message=결제%20처리%20실패
+
+### 4. UserService - Error
+POST http://localhost:8080/api/v1/logs/error?serviceName=UserService&message=사용자%20인증%20오류
+
+### ===== Warn 로그 =====
+
+### 5. OrderService - Warn
+POST http://localhost:8080/api/v1/logs/warn?serviceName=OrderService&message=주문%20처리%20지연%20발생
+
+### 6. PaymentService - Warn
+POST http://localhost:8080/api/v1/logs/warn?serviceName=PaymentService&message=결제%20응답%20시간%20초과
+
+### 7. InventoryService - Warn
+POST http://localhost:8080/api/v1/logs/warn?serviceName=InventoryService&message=재고%20부족%20경고
+
+### ===== Info 로그 =====
+
+### 8. OrderService - Info
+POST http://localhost:8080/api/v1/logs/info?serviceName=OrderService&message=주문%20처리%20완료
+
+### 9. PaymentService - Info
+POST http://localhost:8080/api/v1/logs/info?serviceName=PaymentService&message=결제%20처리%20완료
+
+### 10. ShippingService - Info
+POST http://localhost:8080/api/v1/logs/info?serviceName=ShippingService&message=배송%20시작
+
+### ===== JSON 방식 로그 전송 =====
+
+### 11. 상세 로그 전송
+POST http://localhost:8080/api/v1/logs
+Content-Type: application/json
+
+{
+  "level": "ERROR",
+  "serviceName": "DatabaseService",
+  "message": "데이터베이스 연결 실패",
+  "additionalInfo": "Connection timeout after 30 seconds"
+}
+
+### 12. 디버그 로그
+POST http://localhost:8080/api/v1/logs
+Content-Type: application/json
+
+{
+  "level": "DEBUG",
+  "serviceName": "OrderService",
+  "message": "주문 검증 시작",
+  "additionalInfo": "Order ID: ORD-001"
+}

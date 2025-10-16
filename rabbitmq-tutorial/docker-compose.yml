@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # RabbitMQ 서비스
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq-tutorial
+    ports:
+      - "5672:5672"    # AMQP 포트
+      - "15672:15672"  # Management UI 포트
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - rabbitmq-network
+
+  # MySQL (선택사항 - H2 대신 사용하려면 주석 해제)
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: rabbitmq-mysql
+  #   ports:
+  #     - "3306:3306"
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: rabbitmq_tutorial
+  #     MYSQL_USER: user
+  #     MYSQL_PASSWORD: password
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #   networks:
+  #     - rabbitmq-network
+
+volumes:
+  rabbitmq_data:
+  # mysql_data:
+
+networks:
+  rabbitmq-network:
+    driver: bridge
