@@ -23,9 +23,10 @@ spring:
     # Listener Container 설정
     listener:
       simple:
-        # Consumer 동시성 설정
-        concurrency: 3
-        max-concurrency: 10
+        # Consumer 동시성 설정 (학습용: 1개로 설정)
+        # 운영 환경에서는 부하에 따라 3~10으로 증가
+        concurrency: 1
+        max-concurrency: 3
         # 메시지 재시도 설정
         retry:
           enabled: true
