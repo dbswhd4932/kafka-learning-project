@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${post.title} + ' - High Traffic Example'">게시글 - High Traffic Example</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <a href="/posts">🏠 게시판</a>
+            </h1>
+            <div class="header-actions">
+                <a href="/posts" class="btn btn-secondary">목록으로</a>
+            </div>
+        </header>
+
+        <main>
+            <!-- 게시글 내용 -->
+            <article class="post-detail">
+                <div class="post-title">
+                    <h2 th:text="${post.title}">게시글 제목</h2>
+                </div>
+
+                <div class="post-info">
+                    <span class="author">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12z"/>
+                        </svg>
+                        <span th:text="${post.author}">작성자</span>
+                    </span>
+                    <span class="separator">|</span>
+                    <span class="date">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                        </svg>
+                        <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2025-10-20 14:00</span>
+                    </span>
+                    <span class="separator">|</span>
+                    <span class="stats">
+                        👁️ <strong th:text="${post.viewCount}">0</strong>
+                        ❤️ <strong th:text="${post.likeCount}">0</strong>
+                    </span>
+                </div>
+
+                <div class="post-content">
+                    <p th:each="line : ${#strings.arraySplit(post.content, '\n')}" th:text="${line}"></p>
+                </div>
+
+                <div class="post-actions">
+                    <button type="button" class="btn btn-like" th:attr="data-post-id=${post.id}">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                        </svg>
+                        좋아요 <span class="like-count" th:text="${post.likeCount}">0</span>
+                    </button>
+                </div>
+            </article>
+
+            <!-- 댓글 섹션 -->
+            <section class="comments-section">
+                <div class="comments-header">
+                    <h3>💬 댓글 <span class="comment-count" th:text="${commentCount}">0</span></h3>
+                </div>
+
+                <!-- 댓글 작성 폼 -->
+                <div class="comment-form-wrapper">
+                    <h4>댓글 작성</h4>
+                    <form class="comment-form" id="commentForm">
+                        <input type="hidden" name="postId" th:value="${post.id}">
+                        <div class="form-row">
+                            <input type="text" name="author" placeholder="작성자" required class="form-input form-input-small">
+                        </div>
+                        <div class="form-row">
+                            <textarea name="content" placeholder="댓글을 입력하세요..." required class="form-textarea" rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <button type="submit" class="btn btn-primary">댓글 작성</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 댓글 목록 -->
+                <div class="comments-list">
+                    <div th:if="${comments.isEmpty()}" class="empty-state">
+                        <p>첫 댓글을 작성해보세요! 🎉</p>
+                    </div>
+
+                    <!-- 각 댓글 -->
+                    <div th:each="comment : ${comments}" class="comment-thread">
+                        <!-- 루트 댓글 -->
+                        <div class="comment-item root-comment">
+                            <div class="comment-content" th:classappend="${comment.isDeleted ? 'deleted' : ''}">
+                                <div class="comment-header">
+                                    <span class="comment-author" th:text="${comment.author}">작성자</span>
+                                    <span class="comment-date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2025-10-20 14:00</span>
+                                </div>
+                                <div class="comment-body">
+                                    <p th:text="${comment.content}">댓글 내용</p>
+                                </div>
+                                <div class="comment-actions" th:unless="${comment.isDeleted}">
+                                    <button type="button" class="btn-action reply-btn" th:attr="data-comment-id=${comment.id}">
+                                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z"/>
+                                        </svg>
+                                        답글
+                                    </button>
+                                    <button type="button" class="btn-action delete-btn" th:attr="data-comment-id=${comment.id}">
+                                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                        </svg>
+                                        삭제
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 답글 작성 폼 (숨김) -->
+                            <div class="reply-form-wrapper" th:id="'replyForm-' + ${comment.id}" style="display: none;">
+                                <form class="reply-form">
+                                    <input type="hidden" name="postId" th:value="${post.id}">
+                                    <input type="hidden" name="parentId" th:value="${comment.id}">
+                                    <div class="form-row">
+                                        <input type="text" name="author" placeholder="작성자" required class="form-input form-input-small">
+                                    </div>
+                                    <div class="form-row">
+                                        <textarea name="content" placeholder="답글을 입력하세요..." required class="form-textarea" rows="2"></textarea>
+                                    </div>
+                                    <div class="form-row form-actions">
+                                        <button type="submit" class="btn btn-primary btn-sm">답글 작성</button>
+                                        <button type="button" class="btn btn-secondary btn-sm cancel-reply">취소</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- 대댓글 목록 -->
+                            <div th:if="${!comment.replies.isEmpty()}" class="replies-container">
+                                <div th:each="reply : ${comment.replies}" class="reply-item">
+                                    <div class="comment-content" th:classappend="${reply.isDeleted ? 'deleted' : ''}">
+                                        <div class="reply-indicator">↳</div>
+                                        <div class="reply-content">
+                                            <div class="comment-header">
+                                                <span class="comment-author" th:text="${reply.author}">작성자</span>
+                                                <span class="comment-date" th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}">2025-10-20 14:00</span>
+                                            </div>
+                                            <div class="comment-body">
+                                                <p th:text="${reply.content}">대댓글 내용</p>
+                                            </div>
+                                            <div class="comment-actions" th:unless="${reply.isDeleted}">
+                                                <button type="button" class="btn-action delete-btn" th:attr="data-comment-id=${reply.id}">
+                                                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                    </svg>
+                                                    삭제
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 High Traffic Example</p>
+        </footer>
+    </div>
+
+    <script th:src="@{/js/post-detail.js}"></script>
+</body>
+</html>

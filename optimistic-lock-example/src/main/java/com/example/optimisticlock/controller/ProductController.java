@@ -3,6 +3,7 @@ package com.example.optimisticlock.controller;
 import com.example.optimisticlock.dto.ProductRequest;
 import com.example.optimisticlock.dto.ProductResponse;
 import com.example.optimisticlock.dto.StockUpdateRequest;
+import com.example.optimisticlock.service.ProductRetryService;
 import com.example.optimisticlock.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRetryService productRetryService;
 
     /**
      * 상품 생성
@@ -101,6 +103,50 @@ public class ProductController {
         log.info("재고 증가 요청 - 상품 ID: {}, 수량: {}", id, request.getQuantity());
         ProductResponse response = productService.increaseStock(id, request.getQuantity());
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 재고 감소 (@Retryable 사용)
+     * POST /api/products/{id}/decrease-stock-retryable
+     *
+     * @Retryable 어노테이션을 사용하여 선언적으로 재시도를 처리합니다.
+     * - 낙관적 락 충돌 시 자동으로 재시도 (최대 3회)
+     * - 지수 백오프 적용 (100ms -> 200ms -> 400ms)
+     */
+    @PostMapping("/{id}/decrease-stock-retryable")
+    public ResponseEntity<ProductResponse> decreaseStockWithRetryable(
+            @PathVariable Long id,
+            @RequestBody StockUpdateRequest request) {
+        log.info("재고 감소 요청 (@Retryable) - 상품 ID: {}, 수량: {}", id, request.getQuantity());
+        try {
+            ProductResponse response = productRetryService.decreaseStockWithRetry(id, request.getQuantity());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("재고 감소 실패 (@Retryable) - 상품 ID: {}, 에러: {}", id, e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * 재고 증가 (@Retryable 사용, 고정 간격)
+     * POST /api/products/{id}/increase-stock-retryable
+     *
+     * @Retryable 어노테이션을 사용하여 고정 간격으로 재시도합니다.
+     * - 낙관적 락 충돌 시 자동으로 재시도 (최대 5회)
+     * - 고정 200ms 간격으로 재시도
+     */
+    @PostMapping("/{id}/increase-stock-retryable")
+    public ResponseEntity<ProductResponse> increaseStockWithRetryable(
+            @PathVariable Long id,
+            @RequestBody StockUpdateRequest request) {
+        log.info("재고 증가 요청 (@Retryable) - 상품 ID: {}, 수량: {}", id, request.getQuantity());
+        try {
+            ProductResponse response = productRetryService.increaseStockWithRetry(id, request.getQuantity());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("재고 증가 실패 (@Retryable) - 상품 ID: {}, 에러: {}", id, e.getMessage());
+            throw e;
+        }
     }
 
     /**

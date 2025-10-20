@@ -1,0 +1,315 @@
+### ========================================
+### 게시글 API 테스트
+### ========================================
+
+### 1. 게시글 생성
+POST http://localhost:8080/api/posts
+Content-Type: application/json
+
+{
+  "title": "대용량 트래픽 처리 방법",
+  "content": "Spring Boot와 Redis를 활용한 대용량 트래픽 처리 방법에 대해 알아봅니다.",
+  "author": "김개발"
+}
+
+> {%
+    client.global.set("postId", response.body.id);
+    client.log("Created Post ID: " + response.body.id);
+%}
+
+### 2. 게시글 목록 조회 (페이지 번호 방식)
+GET http://localhost:8080/api/posts?page=0&size=10
+
+### 3. 게시글 목록 조회 (커서 방식 - 첫 페이지)
+GET http://localhost:8080/api/posts/cursor?size=10
+
+> {%
+    client.global.set("nextCursor", response.body.nextCursor);
+%}
+
+### 4. 게시글 목록 조회 (커서 방식 - 다음 페이지)
+GET http://localhost:8080/api/posts/cursor?cursor={{nextCursor}}&size=10
+
+### 5. 게시글 상세 조회
+GET http://localhost:8080/api/posts/{{postId}}
+
+### 6. 게시글 수정
+PUT http://localhost:8080/api/posts/{{postId}}
+Content-Type: application/json
+
+{
+  "title": "대용량 트래픽 처리 방법 (수정)",
+  "content": "Spring Boot, Redis, Kafka를 활용한 대용량 트래픽 처리 방법에 대해 알아봅니다."
+}
+
+### 7. 좋아요 증가
+POST http://localhost:8080/api/posts/{{postId}}/like
+
+### 8. 좋아요 감소
+DELETE http://localhost:8080/api/posts/{{postId}}/like
+
+### 9. 조회수 상위 게시글 조회
+GET http://localhost:8080/api/posts/top/viewed
+
+### 10. 좋아요 상위 게시글 조회
+GET http://localhost:8080/api/posts/top/liked
+
+### 11. 게시글 삭제 (마지막에 실행)
+# DELETE http://localhost:8080/api/posts/{{postId}}
+
+
+### ========================================
+### 댓글 API 테스트 (2 Depth 방식)
+### ========================================
+
+### 12. 루트 댓글 생성 (2 Depth)
+POST http://localhost:8080/api/comments/two-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": null,
+  "content": "정말 유익한 글이네요!",
+  "author": "이백엔드"
+}
+
+> {%
+    client.global.set("rootCommentId", response.body.id);
+    client.log("Created Root Comment ID: " + response.body.id);
+%}
+
+### 13. 대댓글 생성 (2 Depth)
+POST http://localhost:8080/api/comments/two-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": {{rootCommentId}},
+  "content": "저도 그렇게 생각합니다!",
+  "author": "박프론트"
+}
+
+> {%
+    client.global.set("replyId", response.body.id);
+%}
+
+### 14. 대대댓글 생성 시도 (2 Depth - 실패해야 함)
+POST http://localhost:8080/api/comments/two-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": {{replyId}},
+  "content": "대대댓글은 생성할 수 없습니다",
+  "author": "최데브옵스"
+}
+
+### 15. 댓글 목록 조회 (2 Depth)
+GET http://localhost:8080/api/comments/two-depth?postId={{postId}}
+
+### 16. 댓글 수정
+PUT http://localhost:8080/api/comments/{{rootCommentId}}
+Content-Type: application/json
+
+{
+  "content": "정말 유익한 글이네요! (수정됨)"
+}
+
+### 17. 댓글 개수 조회
+GET http://localhost:8080/api/comments/count?postId={{postId}}
+
+### 18. 활성 댓글 개수 조회
+GET http://localhost:8080/api/comments/count/active?postId={{postId}}
+
+
+### ========================================
+### 댓글 API 테스트 (무한 Depth 방식)
+### ========================================
+
+### 19. 루트 댓글 생성 (무한 Depth)
+POST http://localhost:8080/api/comments/infinite-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": null,
+  "content": "무한 depth 댓글입니다",
+  "author": "정아키텍트"
+}
+
+> {%
+    client.global.set("infiniteRootId", response.body.id);
+    client.log("Created Infinite Root Comment ID: " + response.body.id);
+%}
+
+### 20. Depth 1 댓글 생성
+POST http://localhost:8080/api/comments/infinite-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": {{infiniteRootId}},
+  "content": "Depth 1 댓글",
+  "author": "강시니어"
+}
+
+> {%
+    client.global.set("depth1Id", response.body.id);
+%}
+
+### 21. Depth 2 댓글 생성
+POST http://localhost:8080/api/comments/infinite-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": {{depth1Id}},
+  "content": "Depth 2 댓글",
+  "author": "윤주니어"
+}
+
+> {%
+    client.global.set("depth2Id", response.body.id);
+%}
+
+### 22. Depth 3 댓글 생성
+POST http://localhost:8080/api/comments/infinite-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": {{depth2Id}},
+  "content": "Depth 3 댓글",
+  "author": "조풀스택"
+}
+
+> {%
+    client.global.set("depth3Id", response.body.id);
+%}
+
+### 23. Depth 4 댓글 생성
+POST http://localhost:8080/api/comments/infinite-depth
+Content-Type: application/json
+
+{
+  "postId": {{postId}},
+  "parentId": {{depth3Id}},
+  "content": "Depth 4 댓글",
+  "author": "장테크리드"
+}
+
+### 24. 댓글 목록 조회 (무한 Depth - 트리 구조)
+GET http://localhost:8080/api/comments/infinite-depth?postId={{postId}}
+
+
+### ========================================
+### 댓글 삭제 테스트
+### ========================================
+
+### 25. 자식이 있는 댓글 삭제 (소프트 삭제)
+DELETE http://localhost:8080/api/comments/{{infiniteRootId}}
+
+### 26. 삭제된 댓글 조회 (소프트 삭제 확인)
+GET http://localhost:8080/api/comments/{{infiniteRootId}}
+
+### 27. 자식이 없는 댓글 삭제 (실제 삭제)
+DELETE http://localhost:8080/api/comments/{{depth3Id}}
+
+### 28. 삭제된 댓글 조회 (404 에러 발생해야 함)
+GET http://localhost:8080/api/comments/{{depth3Id}}
+
+
+### ========================================
+### 통합 시나리오 테스트
+### ========================================
+
+### 29. 새 게시글 생성
+POST http://localhost:8080/api/posts
+Content-Type: application/json
+
+{
+  "title": "실전 댓글 시스템 구현",
+  "content": "2 depth와 무한 depth 댓글 시스템을 비교합니다.",
+  "author": "임CTO"
+}
+
+> {%
+    client.global.set("newPostId", response.body.id);
+%}
+
+### 30. 여러 댓글 생성
+POST http://localhost:8080/api/comments/two-depth
+Content-Type: application/json
+
+{
+  "postId": {{newPostId}},
+  "parentId": null,
+  "content": "첫 번째 댓글",
+  "author": "사용자1"
+}
+
+> {%
+    client.global.set("comment1", response.body.id);
+%}
+
+###
+POST http://localhost:8080/api/comments/two-depth
+Content-Type: application/json
+
+{
+  "postId": {{newPostId}},
+  "parentId": null,
+  "content": "두 번째 댓글",
+  "author": "사용자2"
+}
+
+> {%
+    client.global.set("comment2", response.body.id);
+%}
+
+###
+POST http://localhost:8080/api/comments/two-depth
+Content-Type: application/json
+
+{
+  "postId": {{newPostId}},
+  "parentId": {{comment1}},
+  "content": "첫 번째 댓글의 대댓글",
+  "author": "사용자3"
+}
+
+###
+POST http://localhost:8080/api/comments/two-depth
+Content-Type: application/json
+
+{
+  "postId": {{newPostId}},
+  "parentId": {{comment2}},
+  "content": "두 번째 댓글의 대댓글",
+  "author": "사용자4"
+}
+
+### 31. 전체 댓글 구조 확인
+GET http://localhost:8080/api/comments/two-depth?postId={{newPostId}}
+
+### 32. 게시글과 댓글 통계
+GET http://localhost:8080/api/posts/{{newPostId}}
+
+###
+GET http://localhost:8080/api/comments/count?postId={{newPostId}}
+
+###
+GET http://localhost:8080/api/comments/count/active?postId={{newPostId}}
+
+
+### ========================================
+### Actuator Health Check
+### ========================================
+
+### 33. 헬스 체크
+GET http://localhost:8080/actuator/health
+
+### 34. 메트릭 조회
+GET http://localhost:8080/actuator/metrics
+
+###
