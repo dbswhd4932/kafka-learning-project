@@ -1,0 +1,158 @@
+### Redis 학습 프로젝트 API 테스트
+### IntelliJ IDEA 또는 VS Code REST Client에서 사용 가능
+
+### ===========================================
+### 1. 성능 비교 - 캐싱 미적용
+### ===========================================
+
+### 1-1. 모든 상품 조회 (캐싱 미적용)
+### 예상: 매번 약 1000ms 소요
+GET http://localhost:8080/api/products/without-cache
+Accept: application/json
+
+### 1-2. ID로 상품 조회 (캐싱 미적용)
+GET http://localhost:8080/api/products/without-cache/1
+Accept: application/json
+
+### 1-3. 카테고리별 상품 조회 (캐싱 미적용)
+GET http://localhost:8080/api/products/without-cache/category/전자기기
+Accept: application/json
+
+
+### ===========================================
+### 2. 성능 비교 - Redis 캐싱 적용
+### ===========================================
+
+### 2-1. 모든 상품 조회 (Redis 캐싱) - 첫 번째 요청
+### 예상: 첫 조회 약 1000ms (DB 조회 + Redis 저장)
+GET http://localhost:8080/api/products/with-cache
+Accept: application/json
+
+### 2-2. 모든 상품 조회 (Redis 캐싱) - 두 번째 요청
+### 예상: 약 10-20ms (Redis에서 조회) ⚡ 50배 이상 빨라짐!
+GET http://localhost:8080/api/products/with-cache
+Accept: application/json
+
+### 2-3. 모든 상품 조회 (Redis 캐싱) - 세 번째 요청
+### 예상: 약 10-20ms (Redis에서 조회)
+GET http://localhost:8080/api/products/with-cache
+Accept: application/json
+
+### 2-4. ID로 상품 조회 (Redis 캐싱) - 첫 번째 요청
+GET http://localhost:8080/api/products/with-cache/1
+Accept: application/json
+
+### 2-5. ID로 상품 조회 (Redis 캐싱) - 두 번째 요청 (캐시 히트)
+GET http://localhost:8080/api/products/with-cache/1
+Accept: application/json
+
+### 2-6. ID로 상품 조회 (다른 상품) - 첫 번째 요청
+GET http://localhost:8080/api/products/with-cache/2
+Accept: application/json
+
+### 2-7. ID로 상품 조회 (다른 상품) - 두 번째 요청 (캐시 히트)
+GET http://localhost:8080/api/products/with-cache/2
+Accept: application/json
+
+### 2-8. 카테고리별 상품 조회 (Redis 캐싱)
+GET http://localhost:8080/api/products/with-cache/category/Electronics
+Accept: application/json
+
+
+### ===========================================
+### 3. 캐시 관리
+### ===========================================
+
+### 3-1. 모든 캐시 삭제
+### 실행 후 다시 조회하면 캐시 미스 발생
+DELETE http://localhost:8080/api/products/cache
+Accept: application/json
+
+
+### ===========================================
+### 4. 사용자 API (Redis 캐싱 적용)
+### ===========================================
+
+### 4-1. 모든 사용자 조회 - 첫 번째 요청
+GET http://localhost:8080/api/users
+Accept: application/json
+
+### 4-2. 모든 사용자 조회 - 두 번째 요청 (캐시 히트)
+GET http://localhost:8080/api/users
+Accept: application/json
+
+### 4-3. ID로 사용자 조회 - 첫 번째 요청
+GET http://localhost:8080/api/users/1
+Accept: application/json
+
+### 4-4. ID로 사용자 조회 - 두 번째 요청 (캐시 히트)
+GET http://localhost:8080/api/users/1
+Accept: application/json
+
+### 4-5. Username으로 사용자 조회 - 첫 번째 요청
+GET http://localhost:8080/api/users/username/user1
+Accept: application/json
+
+### 4-6. Username으로 사용자 조회 - 두 번째 요청 (캐시 히트)
+GET http://localhost:8080/api/users/username/user1
+Accept: application/json
+
+
+### ===========================================
+### 5. 성능 테스트 시나리오
+### ===========================================
+
+### 시나리오 1: 캐싱 효과 확인
+### 1) 캐시 삭제 실행 (3-1)
+### 2) 상품 조회 (2-1) - 느림 (약 1000ms)
+### 3) 상품 조회 (2-2) - 빠름 (약 20ms) ⚡
+### 4) 상품 조회 (2-3) - 빠름 (약 20ms) ⚡
+
+### 시나리오 2: 캐싱 vs 미적용 비교
+### 1) 캐싱 미적용 (1-1) - 매번 느림 (약 1000ms)
+### 2) 캐싱 미적용 (1-1) - 매번 느림 (약 1000ms)
+### 3) 캐싱 적용 (2-1) - 첫 요청 느림 (약 1000ms)
+### 4) 캐싱 적용 (2-2) - 이후 빠름 (약 20ms) ⚡
+
+### 시나리오 3: 개별 상품 캐싱
+### 1) 상품 1 조회 (2-4) - 느림
+### 2) 상품 1 조회 (2-5) - 빠름 ⚡
+### 3) 상품 2 조회 (2-6) - 느림
+### 4) 상품 2 조회 (2-7) - 빠름 ⚡
+### 5) 상품 1 조회 (2-5) - 여전히 빠름 ⚡ (캐시 유지됨)
+
+
+### ===========================================
+### 6. 헬스 체크 및 모니터링
+### ===========================================
+
+### 6-1. 헬스 체크
+GET http://localhost:8080/actuator/health
+Accept: application/json
+
+### 6-2. 애플리케이션 정보
+GET http://localhost:8080/actuator/info
+Accept: application/json
+
+### 6-3. 메트릭 정보
+GET http://localhost:8080/actuator/metrics
+Accept: application/json
+
+
+### ===========================================
+### 사용 방법
+### ===========================================
+###
+### IntelliJ IDEA:
+### - 각 요청 옆의 ▶ 버튼 클릭
+### - 단축키: Ctrl+Enter (Windows/Linux), Cmd+Enter (Mac)
+###
+### VS Code (REST Client 플러그인 필요):
+### 1. Extensions에서 "REST Client" 설치
+### 2. 각 요청 위의 "Send Request" 클릭
+### 3. 단축키: Ctrl+Alt+R (Windows/Linux), Cmd+Alt+R (Mac)
+###
+### 응답 시간 확인:
+### - duration_ms 필드에서 소요 시간 확인
+### - cached: true/false 로 캐시 적용 여부 확인
+###

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.demo.controller.UserControllerTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2025-10-21T06:31:11" hostname="ip-172-18-5-40.ap-northeast-2.compute.internal" time="0.427">
+  <properties/>
+  <testcase name="demonstrateMultipleAssertions()" classname="com.example.demo.controller.UserControllerTest" time="0.399"/>
+  <testcase name="getAllUsers_ShouldReturnUserList()" classname="com.example.demo.controller.UserControllerTest" time="0.005"/>
+  <testcase name="getUserById_WhenNotExists_ShouldReturn404()" classname="com.example.demo.controller.UserControllerTest" time="0.003"/>
+  <testcase name="deleteUser_WhenNotExists_ShouldReturn404()" classname="com.example.demo.controller.UserControllerTest" time="0.003"/>
+  <testcase name="createUser_ShouldReturnCreatedUser()" classname="com.example.demo.controller.UserControllerTest" time="0.003"/>
+  <testcase name="getUserById_WhenExists_ShouldReturnUser()" classname="com.example.demo.controller.UserControllerTest" time="0.004"/>
+  <testcase name="demonstrateFluentAPI()" classname="com.example.demo.controller.UserControllerTest" time="0.003"/>
+  <testcase name="deleteUser_WhenExists_ShouldReturn204()" classname="com.example.demo.controller.UserControllerTest" time="0.001"/>
+  <system-out><![CDATA[15:31:11.090 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.demo.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:31:11.139 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.demo.DemoApplication for test class com.example.demo.controller.UserControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.0)
+
+2025-10-21T15:31:11.280+09:00  INFO 6156 --- [    Test worker] c.e.demo.controller.UserControllerTest   : Starting UserControllerTest using Java 22.0.2 with PID 6156 (started by r00416 in /Users/r00416/Desktop/riman/study/mockmvc-tester-example)
+2025-10-21T15:31:11.281+09:00  INFO 6156 --- [    Test worker] c.e.demo.controller.UserControllerTest   : No active profile set, falling back to 1 default profile: "default"
+2025-10-21T15:31:11.549+09:00  INFO 6156 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2025-10-21T15:31:11.549+09:00  INFO 6156 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-10-21T15:31:11.550+09:00  INFO 6156 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2025-10-21T15:31:11.563+09:00  INFO 6156 --- [    Test worker] c.e.demo.controller.UserControllerTest   : Started UserControllerTest in 0.4 seconds (process running for 0.783)
+]]></system-out>
+  <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/Users/r00416/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.15.10/e8eb255b2c378b9a6c7341e7b0e12f0a5636377/byte-buddy-agent-1.15.10.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>
