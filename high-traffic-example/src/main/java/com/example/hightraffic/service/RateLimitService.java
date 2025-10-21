@@ -72,28 +72,51 @@ public class RateLimitService {
      * @return 허용 여부 (true: 조회수 증가 허용, false: 조회수 증가 차단)
      */
     public boolean isAllowed(String ip) {
+        // ========================================
+        // Redis Key 생성
+        // ========================================
+        // 예: "ratelimit:ip:127.0.0.1"
         String key = RATE_LIMIT_KEY_PREFIX + ip;
 
-        // 현재 요청 횟수 조회
+        // ========================================
+        // [1단계] 현재 요청 횟수 조회
+        // ========================================
+        // Redis에서 현재 IP의 요청 횟수를 가져옴
+        // 키가 없으면 null → 0으로 처리 (첫 요청)
         String countStr = redisTemplate.opsForValue().get(key);
         int currentCount = countStr != null ? Integer.parseInt(countStr) : 0;
 
-        // 제한 초과 체크
+        // ========================================
+        // [2단계] 제한 초과 체크 (정책 B)
+        // ========================================
+        // 1분에 20회를 초과했는지 확인
         if (currentCount >= MAX_REQUESTS_PER_MINUTE) {
             log.warn("Rate Limit 초과: ip={}, count={}", ip, currentCount);
+            // false 반환 → PostService에서 조회수 증가 차단
             return false;
         }
 
-        // 요청 횟수 증가
+        // ========================================
+        // [3단계] 요청 횟수 증가 (Redis에 저장 ⭐)
+        // ========================================
+        // Redis에 INCR 명령으로 요청 횟수 +1
+        // 예: "ratelimit:ip:127.0.0.1" 값이 3 → 4로 증가
+        // 이 부분이 실제로 Redis에 Rate Limit 카운터를 저장하는 곳입니다!
         Long newCount = redisTemplate.opsForValue().increment(key);
 
-        // 첫 요청이면 TTL 설정 (1분)
+        // ========================================
+        // [4단계] 첫 요청이면 TTL 설정
+        // ========================================
+        // 첫 요청 (newCount == 1)일 때만 TTL 60초 설정
+        // 이후 요청들은 이미 TTL이 설정되어 있어서 자동으로 카운트다운됨
+        // 60초 후 키가 자동 삭제되면서 카운터 리셋
         if (newCount == 1) {
             redisTemplate.expire(key, Duration.ofSeconds(WINDOW_SIZE_SECONDS));
         }
 
         log.debug("Rate Limit 체크: ip={}, count={}/{}", ip, newCount, MAX_REQUESTS_PER_MINUTE);
 
+        // true 반환 → PostService에서 조회수 증가 허용
         return true;
     }
 

@@ -74,26 +74,48 @@ public class ViewCountService {
      * @return 증가된 조회수
      */
     public Long increaseViewCount(Long postId, String identifier) {
+        // ========================================
+        // Redis Key 생성
+        // ========================================
+
+        // 예: "post:viewcount:1" (1번 게시글의 조회수)
         String viewCountKey = VIEW_COUNT_KEY_PREFIX + postId;
+
+        // 예: "post:viewed:1:127.0.0.1" (1번 게시글을 127.0.0.1이 조회했다는 플래그)
         String duplicateKey = VIEW_DUPLICATE_KEY_PREFIX + postId + ":" + identifier;
 
-        // 중복 조회 체크
+        // ========================================
+        // [1단계] 중복 조회 체크 (정책 A)
+        // ========================================
+        // Redis에 중복 방지 키가 존재하는지 확인
+        // 존재한다 = 5초 이내에 이미 조회했음
         Boolean isDuplicate = redisTemplate.hasKey(duplicateKey);
 
         if (Boolean.TRUE.equals(isDuplicate)) {
             // 5초 이내 재조회 - 조회수 증가 안함
+            // 현재 조회수만 반환하고 종료
             log.debug("중복 조회 감지: postId={}, identifier={}", postId, identifier);
             return getCurrentViewCount(postId);
         }
 
-        // 조회수 증가
+        // ========================================
+        // [2단계] 조회수 증가 (Redis에 저장 ⭐)
+        // ========================================
+        // Redis에 INCR 명령으로 조회수 +1
+        // 예: "post:viewcount:1" 값이 5 → 6으로 증가
+        // 이 부분이 실제로 Redis에 조회수를 저장하는 곳입니다!
         Long newViewCount = redisTemplate.opsForValue().increment(viewCountKey);
 
-        // 중복 방지 플래그 설정 (5초 TTL)
+        // ========================================
+        // [3단계] 중복 방지 플래그 저장 (Redis에 저장 ⭐)
+        // ========================================
+        // Redis에 중복 방지 키를 5초 TTL로 저장
+        // 예: "post:viewed:1:127.0.0.1" = "1" (5초 후 자동 삭제)
+        // 이 부분이 실제로 Redis에 IP를 저장하는 곳입니다!
         redisTemplate.opsForValue().set(
-                duplicateKey,
-                "1",
-                Duration.ofSeconds(DUPLICATE_PREVENTION_SECONDS)
+                duplicateKey,      // 키: "post:viewed:1:127.0.0.1"
+                "1",               // 값: "1" (플래그)
+                Duration.ofSeconds(DUPLICATE_PREVENTION_SECONDS)  // TTL: 5초
         );
 
         log.debug("조회수 증가: postId={}, identifier={}, newCount={}", postId, identifier, newViewCount);
