@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.redis.service.ViewCountConcurrencyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-10-21T08:21:11" hostname="ip-172-18-5-40.ap-northeast-2.compute.internal" time="0.591">
+  <properties/>
+  <testcase name="10개 스레드가 동시에 조회수 증가 시 정확히 10이 증가해야 한다" classname="com.example.redis.service.ViewCountConcurrencyTest" time="0.591"/>
+  <system-out><![CDATA[17:21:07.944 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.redis.service.ViewCountConcurrencyTest]: ViewCountConcurrencyTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+17:21:08.001 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.redis.RedisLearningApplication for test class com.example.redis.service.ViewCountConcurrencyTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+?[32m :: Spring Boot :: ?[39m              ?[2m (v3.2.0)?[0;39m
+
+?[2m2025-10-21T17:21:08.215+09:00?[0;39m ?[33m WARN?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mory$DuplicateJsonObjectContextCustomizer?[0;39m ?[2m:?[0;39m 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/Users/r00416/.gradle/caches/modules-2/files-2.1/org.json/json/20231013/e22e0c040fe16f04ffdb85d851d77b07fc05ea52/json-20231013.jar!/org/json/JSONObject.class
+	jar:file:/Users/r00416/.gradle/caches/modules-2/files-2.1/com.vaadin.external.google/android-json/0.0.20131108.vaadin1/fa26d351fe62a6a17f5cda1287c1c6110dec413f/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+?[2m2025-10-21T17:21:08.221+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m Starting ViewCountConcurrencyTest using Java 22.0.2 with PID 86213 (started by r00416 in /Users/r00416/Desktop/riman/study/redis-learning-project)
+?[2m2025-10-21T17:21:08.221+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m Running with Spring Boot v3.2.0, Spring v6.1.1
+?[2m2025-10-21T17:21:08.222+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m No active profile set, falling back to 1 default profile: "default"
+?[2m2025-10-21T17:21:08.725+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Multiple Spring Data modules found, entering strict repository configuration mode
+?[2m2025-10-21T17:21:08.725+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+?[2m2025-10-21T17:21:08.795+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Finished Spring Data repository scanning in 65 ms. Found 3 JPA repository interfaces.
+?[2m2025-10-21T17:21:08.804+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Multiple Spring Data modules found, entering strict repository configuration mode
+?[2m2025-10-21T17:21:08.805+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+?[2m2025-10-21T17:21:08.811+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.RepositoryConfigurationExtensionSupport?[0;39m ?[2m:?[0;39m Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.redis.repository.PostRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+?[2m2025-10-21T17:21:08.812+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.RepositoryConfigurationExtensionSupport?[0;39m ?[2m:?[0;39m Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.redis.repository.ProductRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+?[2m2025-10-21T17:21:08.812+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.RepositoryConfigurationExtensionSupport?[0;39m ?[2m:?[0;39m Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.redis.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+?[2m2025-10-21T17:21:08.812+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Finished Spring Data repository scanning in 3 ms. Found 0 Redis repository interfaces.
+?[2m2025-10-21T17:21:09.155+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mo.hibernate.jpa.internal.util.LogHelper ?[0;39m ?[2m:?[0;39m HHH000204: Processing PersistenceUnitInfo [name: default]
+?[2m2025-10-21T17:21:09.182+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36morg.hibernate.Version                   ?[0;39m ?[2m:?[0;39m HHH000412: Hibernate ORM core version 6.3.1.Final
+?[2m2025-10-21T17:21:09.199+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mo.h.c.internal.RegionFactoryInitiator   ?[0;39m ?[2m:?[0;39m HHH000026: Second-level cache disabled
+?[2m2025-10-21T17:21:09.310+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mo.s.o.j.p.SpringPersistenceUnitInfo     ?[0;39m ?[2m:?[0;39m No LoadTimeWeaver setup: ignoring JPA class transformer
+?[2m2025-10-21T17:21:09.322+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mcom.zaxxer.hikari.HikariDataSource      ?[0;39m ?[2m:?[0;39m HikariPool-1 - Starting...
+?[2m2025-10-21T17:21:09.403+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mcom.zaxxer.hikari.pool.HikariPool       ?[0;39m ?[2m:?[0;39m HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2079fcfc
+?[2m2025-10-21T17:21:09.404+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mcom.zaxxer.hikari.HikariDataSource      ?[0;39m ?[2m:?[0;39m HikariPool-1 - Start completed.
+?[2m2025-10-21T17:21:09.431+09:00?[0;39m ?[33m WARN?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36morg.hibernate.orm.deprecation           ?[0;39m ?[2m:?[0;39m HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+?[2m2025-10-21T17:21:09.796+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mo.h.e.t.j.p.i.JtaPlatformInitiator      ?[0;39m ?[2m:?[0;39m HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+?[2m2025-10-21T17:21:09.827+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mj.LocalContainerEntityManagerFactoryBean?[0;39m ?[2m:?[0;39m Initialized JPA EntityManagerFactory for persistence unit 'default'
+?[2m2025-10-21T17:21:10.005+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mo.s.d.j.r.query.QueryEnhancerFactory    ?[0;39m ?[2m:?[0;39m Hibernate is in classpath; If applicable, HQL parser will be used.
+?[2m2025-10-21T17:21:11.011+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mo.s.b.a.e.web.EndpointLinksResolver     ?[0;39m ?[2m:?[0;39m Exposing 3 endpoint(s) beneath base path '/actuator'
+?[2m2025-10-21T17:21:11.051+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m Started ViewCountConcurrencyTest in 2.985 seconds (process running for 3.629)
+?[2m2025-10-21T17:21:11.092+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mcom.example.redis.config.DataLoader     ?[0;39m ?[2m:?[0;39m === 데이터 로딩 시작 ===
+?[2m2025-10-21T17:21:11.125+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36morg.hibernate.SQL                       ?[0;39m ?[2m:?[0;39m 
+    select
+        count(*) 
+    from
+        product p1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        product p1_0
+?[2m2025-10-21T17:21:11.132+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mcom.example.redis.config.DataLoader     ?[0;39m ?[2m:?[0;39m 이미 10000개의 상품이 존재합니다. 데이터 로딩을 건너뜁니다.
+?[2m2025-10-21T17:21:11.459+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36morg.hibernate.SQL                       ?[0;39m ?[2m:?[0;39m 
+    insert 
+    into
+        post
+        (author, content, created_at, title, updated_at, view_count) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        post
+        (author, content, created_at, title, updated_at, view_count) 
+    values
+        (?, ?, ?, ?, ?, ?)
+?[2m2025-10-21T17:21:11.649+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 Redis 조회수 초기화
+?[2m2025-10-21T17:21:11.649+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 테스트 게시글 생성 완료 - ID: 6
+?[2m2025-10-21T17:21:11.650+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m === 동시성 테스트 시작 ===
+?[2m2025-10-21T17:21:11.650+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드 개수: 10
+?[2m2025-10-21T17:21:11.650+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 게시글 ID: 6
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-1]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-1: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-3]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-3: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-2]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-2: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-4]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-4: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-5]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-5: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-6]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-6: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-7]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-7: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.651+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-8]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-8: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m >>> 모든 스레드 동시 시작!
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-9]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-9: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [ool-3-thread-10]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-10: 시작 신호 대기 중...
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 모든 스레드 완료 대기 중...
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-3]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-3: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-1]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-1: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-5]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-5: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-9]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-9: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [ool-3-thread-10]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-10: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-8]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-8: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-4]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-4: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-7]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-7: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-2]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-2: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.652+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-6]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-6: 조회수 증가 시작
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [ool-3-thread-10]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 1
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-3]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 5
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-5]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 8
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-6]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 3
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-1]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 4
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-9]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 2
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-1]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-1: 조회수 증가 완료 (현재 값: 4)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-2]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 6
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-4]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 7
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [ool-3-thread-10]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-10: 조회수 증가 완료 (현재 값: 1)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-4]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-4: 조회수 증가 완료 (현재 값: 7)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-3]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-3: 조회수 증가 완료 (현재 값: 5)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-7]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 10
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-8]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 조회수 증가: 9
+?[2m2025-10-21T17:21:11.658+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-7]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-7: 조회수 증가 완료 (현재 값: 10)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-5]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-5: 조회수 증가 완료 (현재 값: 8)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-6]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-6: 조회수 증가 완료 (현재 값: 3)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-9]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-9: 조회수 증가 완료 (현재 값: 2)
+?[2m2025-10-21T17:21:11.657+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-2]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-2: 조회수 증가 완료 (현재 값: 6)
+?[2m2025-10-21T17:21:11.658+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [pool-3-thread-8]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 스레드-8: 조회수 증가 완료 (현재 값: 9)
+?[2m2025-10-21T17:21:11.658+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 모든 스레드 작업 완료!
+?[2m2025-10-21T17:21:11.659+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m === 테스트 결과 검증 ===
+?[2m2025-10-21T17:21:11.659+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 성공한 스레드 수: 10/10
+?[2m2025-10-21T17:21:11.698+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 최종 조회수: 10
+?[2m2025-10-21T17:21:11.698+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m ✅ 테스트 성공: 10개 스레드가 동시 접근해도 조회수가 정확히 10로 증가했습니다!
+?[2m2025-10-21T17:21:11.701+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.redis.service.ViewCountService      ?[0;39m ?[2m:?[0;39m 게시글 6 Redis 조회수 초기화
+?[2m2025-10-21T17:21:11.710+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36morg.hibernate.SQL                       ?[0;39m ?[2m:?[0;39m 
+    select
+        p1_0.id,
+        p1_0.author,
+        p1_0.content,
+        p1_0.created_at,
+        p1_0.title,
+        p1_0.updated_at,
+        p1_0.view_count 
+    from
+        post p1_0 
+    where
+        p1_0.id=?
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.author,
+        p1_0.content,
+        p1_0.created_at,
+        p1_0.title,
+        p1_0.updated_at,
+        p1_0.view_count 
+    from
+        post p1_0 
+    where
+        p1_0.id=?
+?[2m2025-10-21T17:21:11.718+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36morg.hibernate.SQL                       ?[0;39m ?[2m:?[0;39m 
+    delete 
+    from
+        post 
+    where
+        id=?
+Hibernate: 
+    delete 
+    from
+        post 
+    where
+        id=?
+?[2m2025-10-21T17:21:11.724+09:00?[0;39m ?[32m INFO?[0;39m ?[35m86213?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 테스트 데이터 정리 완료
+]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/Users/r00416/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.10/90ed94ac044ea8953b224304c762316e91fd6b31/byte-buddy-agent-1.14.10.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>
