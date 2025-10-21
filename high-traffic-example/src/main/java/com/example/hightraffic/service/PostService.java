@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final ViewCountService viewCountService;
+    private final RateLimitService rateLimitService;
 
     /**
      * 게시글 생성
@@ -36,14 +38,51 @@ public class PostService {
     }
 
     /**
-     * 게시글 단건 조회
+     * 게시글 단건 조회 (조회수 증가 없음 - API 전용)
      */
-    @Transactional
     public PostResponse getPost(Long id) {
         Post post = findPostById(id);
-        post.increaseViewCount();
-        log.debug("게시글 조회: id={}, viewCount={}", post.getId(), post.getViewCount());
-        return PostResponse.from(post);
+        // Redis에서 현재 조회수 조회
+        Long viewCount = viewCountService.getCurrentViewCount(id);
+        log.debug("게시글 조회: id={}, viewCount={}", post.getId(), viewCount);
+        return PostResponse.from(post, viewCount);
+    }
+
+    /**
+     * 게시글 단건 조회 (조회수 증가 포함 - 뷰 전용)
+     *
+     * 다단계 보안 정책:
+     * 1. Rate Limiting: 1분에 20회 제한 (IP 기반)
+     *    - 초과 시: 조회는 가능하지만 조회수 증가 없음
+     * 2. 중복 방지: 5초 이내 재조회 차단 (IP + 게시글)
+     *    - 중복 시: 조회는 가능하지만 조회수 증가 없음
+     * 3. 조회수 증가: Redis INCR (고성능)
+     *
+     * @param id 게시글 ID
+     * @param identifier 사용자 식별자 (IP 주소)
+     * @return 게시글 응답 (Redis 조회수 포함)
+     */
+    public PostResponse getPostWithViewCount(Long id, String identifier) {
+        Post post = findPostById(id);
+
+        // Rate Limiting 체크 (1분에 20회)
+        boolean isAllowed = rateLimitService.isAllowed(identifier);
+
+        Long viewCount;
+        if (isAllowed) {
+            // Rate limit 허용: 조회수 증가 (5초 중복 방지)
+            viewCount = viewCountService.increaseViewCount(id, identifier);
+            log.debug("게시글 조회 성공 (조회수 증가): id={}, identifier={}, viewCount={}",
+                    post.getId(), identifier, viewCount);
+        } else {
+            // Rate limit 초과: 조회수 증가 없이 현재 값만 반환
+            viewCount = viewCountService.getCurrentViewCount(id);
+            long retryAfterSeconds = rateLimitService.getTimeToReset(identifier);
+            log.warn("Rate Limit 초과로 조회수 증가 차단 (조회는 허용): ip={}, viewCount={}, retryAfter={}초",
+                    identifier, viewCount, retryAfterSeconds);
+        }
+
+        return PostResponse.from(post, viewCount);
     }
 
     /**

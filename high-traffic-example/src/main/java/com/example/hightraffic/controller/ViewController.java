@@ -4,6 +4,8 @@ import com.example.hightraffic.dto.CommentWithRepliesResponse;
 import com.example.hightraffic.dto.PostResponse;
 import com.example.hightraffic.service.CommentService;
 import com.example.hightraffic.service.PostService;
+import com.example.hightraffic.util.RequestUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
@@ -49,11 +51,23 @@ public class ViewController {
 
     /**
      * 게시글 상세 화면 (댓글 포함)
+     *
+     * 조회수 증가 로직:
+     * 1. 클라이언트 IP 추출
+     * 2. Redis 기반 조회수 증가 (5초 중복 방지)
+     * 3. 화면에 Redis 조회수 표시
      */
     @GetMapping("/posts/{id}")
-    public String viewPost(@PathVariable Long id, Model model) {
-        // 게시글 조회
-        PostResponse post = postService.getPost(id);
+    public String viewPost(
+            @PathVariable Long id,
+            HttpServletRequest request,
+            Model model
+    ) {
+        // 클라이언트 IP 추출
+        String clientIp = RequestUtils.getClientIp(request);
+
+        // 게시글 조회 (조회수 증가 포함)
+        PostResponse post = postService.getPostWithViewCount(id, clientIp);
 
         // 댓글 조회 (2 depth 방식)
         List<CommentWithRepliesResponse> comments = commentService.getCommentsTwoDepth(id);

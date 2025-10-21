@@ -76,6 +76,13 @@ public class Post extends BaseEntity {
     }
 
     /**
+     * 조회수 설정 (Redis 동기화용)
+     */
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    /**
      * 좋아요 증가
      */
     public void increaseLikeCount() {

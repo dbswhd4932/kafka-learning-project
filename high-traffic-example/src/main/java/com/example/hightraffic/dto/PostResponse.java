@@ -35,4 +35,24 @@ public class PostResponse {
                 .updatedAt(post.getUpdatedAt())
                 .build();
     }
+
+    /**
+     * Post 엔티티와 Redis 조회수로 PostResponse 생성
+     *
+     * @param post Post 엔티티
+     * @param viewCount Redis의 조회수
+     * @return PostResponse
+     */
+    public static PostResponse from(Post post, Long viewCount) {
+        return PostResponse.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .author(post.getAuthor())
+                .viewCount(viewCount)  // Redis 조회수 사용
+                .likeCount(post.getLikeCount())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .build();
+    }
 }

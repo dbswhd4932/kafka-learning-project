@@ -22,9 +22,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Map<String, Object>> handleBusinessException(BusinessException e) {
         log.error("Business Exception: {}", e.getMessage(), e);
+
+        Map<String, Object> errorResponse = createErrorResponse(e.getMessage(), e.getStatus());
+
+        // 429 Too Many Requests 에러일 때 Retry-After 정보 추가
+        if (e.getStatus().value() == 429) {
+            // 메시지에서 초 단위 추출 (예: "30초 후에 다시 시도해주세요" → 30)
+            String message = e.getMessage();
+            if (message.contains("초 후에")) {
+                try {
+                    String[] parts = message.split("초 후에");
+                    String numberPart = parts[0].replaceAll("[^0-9]", "");
+                    if (!numberPart.isEmpty()) {
+                        int retryAfterSeconds = Integer.parseInt(numberPart);
+                        errorResponse.put("retryAfter", retryAfterSeconds);
+                    }
+                } catch (Exception ex) {
+                    // 파싱 실패 시 무시
+                }
+            }
+        }
+
         return ResponseEntity
                 .status(e.getStatus())
-                .body(createErrorResponse(e.getMessage(), e.getStatus()));
+                .body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
