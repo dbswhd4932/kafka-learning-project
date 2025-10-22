@@ -1,8 +1,98 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.redis.service.ViewCountConcurrencyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-10-22T04:45:11" hostname="ip-172-18-5-40.ap-northeast-2.compute.internal" time="0.534">
-  <properties/>
-  <testcase name="[실패 예상] 동기화 없이 조회수 증가 시 Race Condition 발생" classname="com.example.redis.service.ViewCountConcurrencyTest" time="0.534"/>
-  <system-out><![CDATA[13:45:08.454 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.redis.service.ViewCountConcurrencyTest]: ViewCountConcurrencyTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - ViewCountConcurrencyTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>ViewCountConcurrencyTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.example.redis.service.html">com.example.redis.service</a> &gt; ViewCountConcurrencyTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.534s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+<li>
+<a href="#tab2">Standard error</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">[실패 예상] 동기화 없이 조회수 증가 시 Race Condition 발생</td>
+<td class="success">testWithoutSynchronization()</td>
+<td class="success">0.534s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>13:45:08.454 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.example.redis.service.ViewCountConcurrencyTest]: ViewCountConcurrencyTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
 13:45:08.503 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.example.redis.RedisLearningApplication for test class com.example.redis.service.ViewCountConcurrencyTest
 
   .   ____          _            __ _ _
@@ -24,7 +114,7 @@ You may wish to exclude one of them to ensure predictable runtime behavior
 
 ?[2m2025-10-22T13:45:08.705+09:00?[0;39m ?[32m INFO?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m Starting ViewCountConcurrencyTest using Java 22.0.2 with PID 21825 (started by r00416 in /Users/r00416/Desktop/riman/study/redis-learning-project)
 ?[2m2025-10-22T13:45:08.705+09:00?[0;39m ?[32mDEBUG?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m Running with Spring Boot v3.2.0, Spring v6.1.1
-?[2m2025-10-22T13:45:08.706+09:00?[0;39m ?[32m INFO?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m No active profile set, falling back to 1 default profile: "default"
+?[2m2025-10-22T13:45:08.706+09:00?[0;39m ?[32m INFO?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m No active profile set, falling back to 1 default profile: &quot;default&quot;
 ?[2m2025-10-22T13:45:09.096+09:00?[0;39m ?[32m INFO?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Multiple Spring Data modules found, entering strict repository configuration mode
 ?[2m2025-10-22T13:45:09.096+09:00?[0;39m ?[32m INFO?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Bootstrapping Spring Data JPA repositories in DEFAULT mode.
 ?[2m2025-10-22T13:45:09.154+09:00?[0;39m ?[32m INFO?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36m.s.d.r.c.RepositoryConfigurationDelegate?[0;39m ?[2m:?[0;39m Finished Spring Data repository scanning in 54 ms. Found 3 JPA repository interfaces.
@@ -119,10 +209,29 @@ Hibernate:
     where
         id=?
 ?[2m2025-10-22T13:45:11.897+09:00?[0;39m ?[32m INFO?[0;39m ?[35m21825?[0;39m ?[2m---?[0;39m ?[2m[redis-learning-project] [    Test worker]?[0;39m ?[2m?[0;39m?[36mc.e.r.service.ViewCountConcurrencyTest  ?[0;39m ?[2m:?[0;39m 테스트 데이터 정리 완료
-]]></system-out>
-  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/Users/r00416/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.10/90ed94ac044ea8953b224304c762316e91fd6b31/byte-buddy-agent-1.14.10.jar)
+</pre>
+</span>
+</div>
+<div id="tab2" class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre>WARNING: A Java agent has been loaded dynamically (/Users/r00416/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.10/90ed94ac044ea8953b224304c762316e91fd6b31/byte-buddy-agent-1.14.10.jar)
 WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
 WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
 WARNING: Dynamic loading of agents will be disallowed by default in a future release
-]]></system-err>
-</testsuite>
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.12</a> at 2025. 10. 22. 오후 1:45:12</p>
+</div>
+</div>
+</body>
+</html>
