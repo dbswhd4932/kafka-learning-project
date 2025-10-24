@@ -27,8 +27,8 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderTransactionService transactionService;
+    private final OrderEventPublishService eventPublishService;
     private final OrderRepository orderRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 주문 생성 (메인 흐름)
@@ -61,8 +61,8 @@ public class OrderService {
             orderEntity = transactionService.markOrderAsSuccess(orderEntity.getOrderId());
             log.info("✅ [트랜잭션 2] 주문 성공 처리 완료: {}", orderEntity.getOrderId());
 
-            // 5. 성공한 주문만 Kafka 이벤트 발행
-            publishSuccessEvent(orderEntity);
+            // 5. 성공한 주문만 Kafka 이벤트 발행 (트랜잭션 3)
+            eventPublishService.publishSuccessEvent(orderEntity);
             log.info("📤 Kafka 이벤트 발행 완료: {}", orderEntity.getOrderId());
 
         } else {
@@ -106,18 +106,6 @@ public class OrderService {
         }
 
         return success;
-    }
-
-    /**
-     * 성공 이벤트 발행
-     * - 성공한 주문만 Kafka로 전송
-     */
-    private void publishSuccessEvent(OrderEntity orderEntity) {
-        Order order = convertToOrder(orderEntity);
-        SalesOrderEvent event = SalesOrderEvent.of(this, order);
-        eventPublisher.publishEvent(event);
-
-        log.info("📤 판매 주문 이벤트 발행: {}", orderEntity.getOrderId());
     }
 
     /**

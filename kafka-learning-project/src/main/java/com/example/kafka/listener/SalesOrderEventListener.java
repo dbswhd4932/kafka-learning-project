@@ -33,7 +33,7 @@ public class SalesOrderEventListener {
 
     /**
      * 판매 주문 이벤트 처리
-     * - @TransactionalEventListener: 트랜잭션 커밋 후 실행
+     * - @TransactionalEventListener: 트랜잭션 커밋 후 실행 (OrderService.publishSuccessEvent의 @Transactional 커밋 대기)
      * - @Async: 비동기 처리
      * - REQUIRES_NEW: 새로운 트랜잭션으로 실행 (실패 저장을 위해)
      */
