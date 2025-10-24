@@ -1,16 +1,14 @@
 package com.example.kafka.service;
 
+import com.example.kafka.common.KafkaProducerCluster;
 import com.example.kafka.domain.Order;
 import com.example.kafka.entity.OrderEntity;
-import com.example.kafka.enums.OrderStatus;
-import com.example.kafka.event.SalesOrderEvent;
+import com.example.kafka.enums.MessageCategory;
+import com.example.kafka.message.SalesOrderMessage;
 import com.example.kafka.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,6 +18,7 @@ import java.util.UUID;
  * 주문 서비스
  * - 트랜잭션 분리 패턴 적용
  * - 각 비즈니스 단위별로 트랜잭션 분리
+ * - Kafka 직접 사용 (Event 불필요)
  */
 @Slf4j
 @Service
@@ -27,7 +26,7 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderTransactionService transactionService;
-    private final OrderEventPublishService eventPublishService;
+    private final KafkaProducerCluster kafkaProducer;
     private final OrderRepository orderRepository;
 
     /**
@@ -38,7 +37,7 @@ public class OrderService {
      * 1. 주문 정보 검증 및 초기화
      * 2. PENDING 상태로 주문 생성 (트랜잭션 1)
      * 3. 결제 처리 시뮬레이션
-     * 4-1. 성공 시: 주문 성공 처리 (트랜잭션 2) + 이벤트 발행
+     * 4-1. 성공 시: 주문 성공 처리 (트랜잭션 2) + Kafka 발행
      * 4-2. 실패 시: 주문 실패 처리 (트랜잭션 3)
      */
     public Order createOrder(Order order) {
@@ -61,9 +60,8 @@ public class OrderService {
             orderEntity = transactionService.markOrderAsSuccess(orderEntity.getOrderId());
             log.info("✅ [트랜잭션 2] 주문 성공 처리 완료: {}", orderEntity.getOrderId());
 
-            // 5. 성공한 주문만 Kafka 이벤트 발행 (트랜잭션 3)
-            eventPublishService.publishSuccessEvent(orderEntity);
-            log.info("📤 Kafka 이벤트 발행 완료: {}", orderEntity.getOrderId());
+            // 5. 성공한 주문만 Kafka로 직접 발행
+            publishToKafka(orderEntity);
 
         } else {
             // 4-2. 결제 실패: 주문 실패 처리 (트랜잭션 3)
@@ -76,6 +74,52 @@ public class OrderService {
         log.info("========================================");
 
         return convertToOrder(orderEntity);
+    }
+
+    /**
+     * Kafka로 메시지 발행
+     * - Event 없이 직접 Kafka Producer 사용
+     */
+    private void publishToKafka(OrderEntity orderEntity) {
+        try {
+            log.info("📤 Kafka 메시지 발행 시작: {}", orderEntity.getOrderId());
+
+            // 1. Entity -> Message 변환
+            Order order = convertToOrder(orderEntity);
+            SalesOrderMessage message = SalesOrderMessage.builder()
+                    .orderId(order.getOrderId())
+                    .customerId(order.getCustomerId())
+                    .productName(order.getProductName())
+                    .quantity(order.getQuantity())
+                    .price(order.getPrice())
+                    .totalAmount(order.getTotalAmount())
+                    .status(order.getStatus())
+                    .orderDateTime(order.getOrderDateTime())
+                    .build();
+
+            // 2. sales-orders 토픽으로 발행
+            kafkaProducer.sendMessage(
+                    message.getOrderId(),
+                    message,
+                    MessageCategory.SALES_ORDER
+            );
+
+            log.info("✅ Kafka 메시지 발행 성공: {} -> sales-orders 토픽", orderEntity.getOrderId());
+
+            // 3. 성공 메시지도 별도 토픽으로 발행 (모니터링용)
+            kafkaProducer.sendMessage(
+                    message.getOrderId(),
+                    message,
+                    MessageCategory.ORDER_SUCCESS
+            );
+
+            log.info("✅ 성공 메시지 발행: {} -> order-success 토픽", orderEntity.getOrderId());
+
+        } catch (Exception e) {
+            log.error("❌ Kafka 메시지 발행 실패: {}", orderEntity.getOrderId(), e);
+            // Kafka 발행 실패해도 주문 처리는 완료된 상태
+            // 필요시 재시도 로직 또는 별도 저장 로직 추가 가능
+        }
     }
 
     /**
