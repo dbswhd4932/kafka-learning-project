@@ -1,0 +1,38 @@
+### 주문 생성 (Order Creation)
+POST http://localhost:8090/api/orders
+Content-Type: application/json
+
+{
+  "customerId": "CUST-001",
+  "productName": "MacBook Pro M3",
+  "quantity": 1,
+  "price": 2500000
+}
+
+### 주문 생성 - 예제 2
+POST http://localhost:8090/api/orders
+Content-Type: application/json
+
+{
+  "customerId": "CUST-002",
+  "productName": "iPhone 15 Pro",
+  "quantity": 2,
+  "price": 1500000
+}
+
+### 주문 생성 - 예제 3
+POST http://localhost:8090/api/orders
+Content-Type: application/json
+
+{
+  "customerId": "CUST-003",
+  "productName": "AirPods Pro",
+  "quantity": 3,
+  "price": 350000
+}
+
+### 대량 주문 생성 (Bulk Orders)
+POST http://localhost:8090/api/orders/bulk?count=10
+
+### 헬스체크 (Health Check)
+GET http://localhost:8090/api/orders/health

@@ -1,0 +1,86 @@
+spring:
+  application:
+    name: kafka-learning-project
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/kafkadb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: 8090
+
+logging:
+  level:
+    root: INFO
+    com.example.kafka: DEBUG
+    org.apache.kafka: INFO
+    org.springframework.kafka: DEBUG
+
+# ====================================
+# Kafka 설정 (ConfigurationProperties)
+# ====================================
+
+# Kafka Producer 설정
+kafka:
+  producer:
+    bootstrap-servers: localhost:9092
+    acks: all                          # 메시지 확인 수준 (0, 1, all)
+    retries: 3                         # 재시도 횟수
+    batch-size: 16384                  # 배치 크기 (bytes)
+    linger-ms: 1                       # 배치 전송 대기 시간 (ms)
+    buffer-memory: 33554432            # 버퍼 메모리 (bytes)
+    compression-type: none             # 압축 타입 (none, gzip, snappy, lz4, zstd)
+    request-timeout-ms: 30000          # 요청 타임아웃 (ms)
+    max-block-ms: 60000                # 최대 블록 시간 (ms)
+
+  # Kafka Consumer 설정
+  consumer:
+    bootstrap-servers: localhost:9092
+    group-id: kafka-learning-group     # Consumer Group ID
+    auto-offset-reset: earliest        # Offset 초기화 전략 (earliest, latest, none)
+    enable-auto-commit: true           # 자동 커밋 활성화
+    auto-commit-interval-ms: 1000      # 자동 커밋 간격 (ms)
+    max-poll-records: 500              # 한 번에 가져올 최대 레코드 수
+    max-poll-interval-ms: 300000       # Poll 간격 (ms)
+    session-timeout-ms: 10000          # 세션 타임아웃 (ms)
+    heartbeat-interval-ms: 3000        # 하트비트 간격 (ms)
+    concurrency: 3                     # Consumer 스레드 수
+
+  # SSL/Security 설정 (프로덕션 환경용)
+  ssl:
+    enabled: false                     # SSL 활성화 여부
+    security-protocol: PLAINTEXT       # PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
+    # SASL 설정 (필요시 주석 해제)
+    # sasl-mechanism: SCRAM-SHA-256
+    # sasl-jaas-config: org.apache.kafka.common.security.scram.ScramLoginModule required username="user" password="password";
+
+  # Kafka Topic 설정 (MessageCategory Enum과 매핑)
+  topics:
+    # 판매 주문 토픽
+    - category: SALES_ORDER
+      name: sales-orders
+      partitions: 3
+      replication-factor: 1
+
+    # 주문 성공 토픽 (모니터링용)
+    - category: ORDER_SUCCESS
+      name: order-success
+      partitions: 1
+      replication-factor: 1
+
+    # 주문 실패 토픽 (에러 추적용)
+    - category: ORDER_FAILURE
+      name: order-failure
+      partitions: 1
+      replication-factor: 1
