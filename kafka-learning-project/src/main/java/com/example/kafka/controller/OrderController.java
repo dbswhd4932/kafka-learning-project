@@ -74,6 +74,84 @@ public class OrderController {
     }
 
     /**
+     * 같은 고객의 여러 주문 생성 (Key 파티셔닝 테스트)
+     * POST /api/orders/same-customer?customerId=CUST-TEST&count=5
+     */
+    @PostMapping("/same-customer")
+    public ResponseEntity<String> createSameCustomerOrders(
+            @RequestParam(defaultValue = "CUST-TEST") String customerId,
+            @RequestParam(defaultValue = "5") int count) {
+        log.info("Creating {} orders for same customer: {}", count, customerId);
+
+        int successCount = 0;
+        int failCount = 0;
+
+        for (int i = 0; i < count; i++) {
+            Order order = Order.builder()
+                    .customerId(customerId)  // 같은 고객 ID
+                    .productId("PROD-00" + (i % 5 + 1))
+                    .productName("Product " + (i % 5 + 1))
+                    .quantity(i + 1)
+                    .price(BigDecimal.valueOf(10000 * (i + 1)))
+                    .build();
+
+            try {
+                Order result = orderService.createOrder(order);
+                if ("SUCCESS".equals(result.getStatus())) {
+                    successCount++;
+                    log.info("Order {} created: {}", i + 1, result.getOrderId());
+                } else {
+                    failCount++;
+                }
+            } catch (Exception e) {
+                failCount++;
+                log.error("Order creation failed: {}", e.getMessage());
+            }
+        }
+
+        return ResponseEntity.ok(String.format(
+                "Customer: %s, Total: %d, Success: %d, Failed: %d",
+                customerId, count, successCount, failCount
+        ));
+    }
+
+    /**
+     * Partition 분산 테스트 (Key별 파티션 확인)
+     * GET /api/orders/test-partition
+     */
+    @GetMapping("/test-partition")
+    public ResponseEntity<String> testPartition() {
+        StringBuilder result = new StringBuilder();
+        result.append("=== Partition Distribution Test ===\n\n");
+
+        // 같은 Key로 3번 전송 (같은 파티션으로 가야 함)
+        String testKey = "TEST-KEY-123";
+
+        for (int i = 0; i < 3; i++) {
+            Order order = Order.builder()
+                    .orderId(testKey)  // 같은 Key 사용!
+                    .customerId("CUST-PARTITION-TEST")
+                    .productId("PROD-TEST")
+                    .productName("Partition Test Product")
+                    .quantity(1)
+                    .price(BigDecimal.valueOf(10000))
+                    .build();
+
+            try {
+                orderService.createOrder(order);
+                result.append(String.format("Message %d sent with key: %s\n", i + 1, testKey));
+            } catch (Exception e) {
+                result.append(String.format("Message %d failed: %s\n", i + 1, e.getMessage()));
+            }
+        }
+
+        result.append("\n✅ Check logs to verify all messages went to the SAME partition!\n");
+        result.append("Look for: 'Successfully sent message with key - topic: sales-orders, key: TEST-KEY-123'\n");
+
+        return ResponseEntity.ok(result.toString());
+    }
+
+    /**
      * 헬스체크
      * GET /api/orders/health
      */
