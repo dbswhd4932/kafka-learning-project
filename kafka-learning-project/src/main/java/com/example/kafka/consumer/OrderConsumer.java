@@ -69,25 +69,6 @@ public class OrderConsumer {
     }
 
     /**
-     * 고액 주문 필터링 Consumer
-     * - 1,000,000원 이상 주문만 처리
-     */
-    @KafkaListener(topics = "high-value-orders", groupId = "high-value-order-group")
-    public void consumeHighValueOrders(Order order) {
-        if (order.getTotalAmount().longValue() >= 1000000) {
-            log.warn("========================================");
-            log.warn("HIGH VALUE ORDER DETECTED!");
-            log.warn("Order ID: {}", order.getOrderId());
-            log.warn("Customer ID: {}", order.getCustomerId());
-            log.warn("Total Amount: {}", order.getTotalAmount());
-            log.warn("========================================");
-
-            // 고액 주문 알림 발송 등
-            notifyHighValueOrder(order);
-        }
-    }
-
-    /**
      * 주문 처리 비즈니스 로직
      */
     private void processOrder(Order order) {
@@ -112,17 +93,5 @@ public class OrderConsumer {
         // - 매출 통계 집계
         // - 인기 상품 분석
         // - 고객 구매 패턴 분석 등
-    }
-
-    /**
-     * 고액 주문 알림
-     */
-    private void notifyHighValueOrder(Order order) {
-        log.info("Sending notification for high-value order: {}", order.getOrderId());
-
-        // 실제 알림 로직 구현
-        // - 관리자 이메일 발송
-        // - Slack 알림
-        // - SMS 발송 등
     }
 }

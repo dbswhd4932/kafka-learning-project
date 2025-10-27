@@ -17,6 +17,10 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  # Kafka Streams 설정
+  kafka:
+    bootstrap-servers: localhost:9092
+
 server:
   port: 8090
 
@@ -82,5 +86,17 @@ kafka:
     # 주문 실패 토픽 (에러 추적용)
     - category: ORDER_FAILURE
       name: order-failure
+      partitions: 1
+      replication-factor: 1
+
+    # 고액 주문 토픽 (Kafka Streams 출력)
+    - category: HIGH_VALUE_ORDERS
+      name: high-value-orders
+      partitions: 1
+      replication-factor: 1
+
+    # 시간대별 매출 집계 토픽 (Kafka Streams 출력)
+    - category: HOURLY_SALES
+      name: hourly-sales
       partitions: 1
       replication-factor: 1

@@ -27,7 +27,7 @@ Content-Type: application/json
 {
   "customerId": "CUST-003",
   "productName": "AirPods Pro",
-  "quantity": 3,
+  "quantity": 1,
   "price": 350000
 }
 
