@@ -20,8 +20,7 @@ public enum MessageCategory {
     ORDER_FAILURE("주문 실패"),
 
     // Kafka Streams 출력
-    HIGH_VALUE_ORDERS("고액 주문"),
-    HOURLY_SALES("시간대별 매출");
+    HIGH_VALUE_ORDERS("고액 주문");
 
     private final String description;
 }

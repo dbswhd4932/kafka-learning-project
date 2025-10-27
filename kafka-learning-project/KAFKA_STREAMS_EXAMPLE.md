@@ -284,6 +284,172 @@ Order: Order(orderId=ORD-YYY, customerId=USER-001, ...)
 Processing order: ORD-YYY
 ```
 
+## Interactive Query API 사용하기
+
+### 개념
+
+**Interactive Query**는 Kafka Streams의 State Store(상태 저장소)를 REST API로 실시간 조회하는 기능입니다.
+
+- **State Store**: Kafka Streams가 집계한 데이터를 저장하는 로컬 저장소
+- **실시간 조회**: 별도 DB 없이 집계 중인 데이터를 바로 조회 가능
+- **용도**: 실시간 대시보드, 통계 조회, 모니터링
+
+### API 엔드포인트
+
+#### 1. 상품별 주문 건수 조회
+
+**요청**:
+```bash
+GET http://localhost:8090/api/streams/products/{productId}/count
+```
+
+**예시**:
+```bash
+# PROD-001 상품 주문 건수 조회
+curl http://localhost:8090/api/streams/products/PROD-001/count
+```
+
+**응답**:
+```json
+{
+  "productId": "PROD-001",
+  "orderCount": 5,
+  "message": "실시간 집계 데이터 조회 성공"
+}
+```
+
+#### 2. API 상태 확인 (헬스체크)
+
+**요청**:
+```bash
+curl http://localhost:8090/api/streams/health
+```
+
+**응답**:
+```json
+{
+  "status": "UP",
+  "message": "Kafka Streams Interactive Query API is running"
+}
+```
+
+### 전체 테스트 시나리오
+
+#### 1단계: 주문 생성
+
+```bash
+# 맥북 프로 주문 (PROD-001, 250만원)
+curl -X POST http://localhost:8090/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "CUST-001",
+    "productId": "PROD-001",
+    "productName": "맥북 프로",
+    "quantity": 1,
+    "price": 2500000
+  }'
+
+# 맥북 프로 주문 2개 더 생성
+curl -X POST http://localhost:8090/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "CUST-002",
+    "productId": "PROD-001",
+    "productName": "맥북 프로",
+    "quantity": 1,
+    "price": 2500000
+  }'
+
+curl -X POST http://localhost:8090/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "CUST-003",
+    "productId": "PROD-001",
+    "productName": "맥북 프로",
+    "quantity": 1,
+    "price": 2500000
+  }'
+```
+
+#### 2단계: 실시간 집계 조회
+
+```bash
+# 잠시 대기 (Kafka Streams 처리 시간)
+sleep 2
+
+# PROD-001 상품 주문 건수 조회
+curl http://localhost:8090/api/streams/products/PROD-001/count
+```
+
+**예상 응답**:
+```json
+{
+  "productId": "PROD-001",
+  "orderCount": 3,
+  "message": "실시간 집계 데이터 조회 성공"
+}
+```
+
+#### 3단계: 다른 상품 조회
+
+```bash
+# 키보드 주문 생성 (PROD-002)
+curl -X POST http://localhost:8090/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerId": "CUST-004",
+    "productId": "PROD-002",
+    "productName": "키보드",
+    "quantity": 1,
+    "price": 150000
+  }'
+
+# PROD-002 상품 주문 건수 조회
+curl http://localhost:8090/api/streams/products/PROD-002/count
+```
+
+**예상 응답**:
+```json
+{
+  "productId": "PROD-002",
+  "orderCount": 1,
+  "message": "실시간 집계 데이터 조회 성공"
+}
+```
+
+### 주요 특징
+
+#### 1. 별도 DB 불필요
+- State Store가 인메모리 DB 역할
+- Redis, MySQL 등 추가 인프라 없이 실시간 조회 가능
+
+#### 2. 정확한 집계
+- Kafka Streams의 Exactly-Once 보장
+- 중복 없는 정확한 카운트
+
+#### 3. 낮은 레이턴시
+- 로컬 State Store에서 직접 조회
+- 네트워크 I/O 없이 빠른 응답
+
+### 제약사항
+
+#### 1. Key 기반 조회만 가능
+```bash
+# ✅ 가능: 특정 상품 ID로 조회
+GET /api/streams/products/PROD-001/count
+
+# ❌ 불가능: 전체 상품 목록 조회 (복잡한 쿼리)
+GET /api/streams/products?orderCountGreaterThan=10
+```
+
+#### 2. 집계된 데이터만 조회 가능
+- State Store는 `.count()`, `.aggregate()` 결과만 저장
+- 원본 주문 데이터는 조회 불가 (토픽에서 조회 필요)
+
+#### 3. 애플리케이션 재시작 시 State Store 초기화
+- State Store는 로컬 저장소
+- 애플리케이션 재시작 시 처음부터 다시 집계
+
 ## Kafka CLI로 확인
 
 ### 1. high-value-orders 토픽 확인

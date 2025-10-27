@@ -45,11 +45,13 @@ public class OrderController {
         int failCount = 0;
 
         for (int i = 0; i < count; i++) {
+            int productIndex = i % 5 + 1;
             Order order = Order.builder()
                     .customerId("CUST-" + (1000 + i))
-                    .productName("Product " + (i % 5 + 1))
+                    .productId("PROD-00" + productIndex)
+                    .productName("Product " + productIndex)
                     .quantity(i % 10 + 1)
-                    .price(BigDecimal.valueOf((i % 5 + 1) * 10000))
+                    .price(BigDecimal.valueOf(productIndex * 10000))
                     .build();
 
             try {

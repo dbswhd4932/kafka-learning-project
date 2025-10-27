@@ -47,6 +47,8 @@ kafka:
     compression-type: none             # 압축 타입 (none, gzip, snappy, lz4, zstd)
     request-timeout-ms: 30000          # 요청 타임아웃 (ms)
     max-block-ms: 60000                # 최대 블록 시간 (ms)
+    properties:
+      spring.json.add.type.headers: false  # Type 헤더 비활성화
 
   # Kafka Consumer 설정
   consumer:
@@ -92,11 +94,5 @@ kafka:
     # 고액 주문 토픽 (Kafka Streams 출력)
     - category: HIGH_VALUE_ORDERS
       name: high-value-orders
-      partitions: 1
-      replication-factor: 1
-
-    # 시간대별 매출 집계 토픽 (Kafka Streams 출력)
-    - category: HOURLY_SALES
-      name: hourly-sales
       partitions: 1
       replication-factor: 1

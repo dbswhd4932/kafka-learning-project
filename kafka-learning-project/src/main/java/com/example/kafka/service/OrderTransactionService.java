@@ -35,6 +35,7 @@ public class OrderTransactionService {
         OrderEntity entity = OrderEntity.builder()
                 .orderId(order.getOrderId())
                 .customerId(order.getCustomerId())
+                .productId(order.getProductId())
                 .productName(order.getProductName())
                 .quantity(order.getQuantity())
                 .price(order.getPrice())

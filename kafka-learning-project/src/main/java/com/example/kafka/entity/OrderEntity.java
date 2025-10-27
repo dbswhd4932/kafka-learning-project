@@ -44,6 +44,12 @@ public class OrderEntity extends BaseEntity {
     private String customerId;
 
     /**
+     * 상품 ID
+     */
+    @Column(name = "product_id", nullable = false, length = 100, columnDefinition = "varchar(100) COMMENT '상품 ID'")
+    private String productId;
+
+    /**
      * 상품명
      */
     @Column(name = "product_name", nullable = false, length = 200, columnDefinition = "varchar(200) COMMENT '상품명'")

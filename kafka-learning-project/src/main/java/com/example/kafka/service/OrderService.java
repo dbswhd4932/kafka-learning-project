@@ -84,18 +84,9 @@ public class OrderService {
         try {
             log.info("📤 Kafka 메시지 발행 시작: {}", orderEntity.getOrderId());
 
-            // 1. Entity -> Message 변환
+            // 1. Entity -> Order -> Message 변환
             Order order = convertToOrder(orderEntity);
-            SalesOrderMessage message = SalesOrderMessage.builder()
-                    .orderId(order.getOrderId())
-                    .customerId(order.getCustomerId())
-                    .productName(order.getProductName())
-                    .quantity(order.getQuantity())
-                    .price(order.getPrice())
-                    .totalAmount(order.getTotalAmount())
-                    .status(order.getStatus())
-                    .orderDateTime(order.getOrderDateTime())
-                    .build();
+            SalesOrderMessage message = SalesOrderMessage.from(order);
 
             // 2. sales-orders 토픽으로 발행
             kafkaProducer.sendMessage(
@@ -160,6 +151,11 @@ public class OrderService {
             order.setOrderId("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         }
 
+        // productId가 없으면 productName을 사용
+        if (order.getProductId() == null || order.getProductId().isEmpty()) {
+            order.setProductId(order.getProductName());
+        }
+
         order.setOrderDateTime(LocalDateTime.now());
 
         if (order.getTotalAmount() == null && order.getPrice() != null && order.getQuantity() != null) {
@@ -174,6 +170,7 @@ public class OrderService {
         return Order.builder()
                 .orderId(entity.getOrderId())
                 .customerId(entity.getCustomerId())
+                .productId(entity.getProductId())
                 .productName(entity.getProductName())
                 .quantity(entity.getQuantity())
                 .price(entity.getPrice())

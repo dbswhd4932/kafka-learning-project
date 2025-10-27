@@ -2,6 +2,9 @@ package com.example.kafka.config;
 
 import com.example.kafka.properties.KafkaProducerProperties;
 import com.example.kafka.properties.KafkaSSLProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -13,6 +16,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -30,18 +35,40 @@ public class KafkaProducerConfig {
     private final KafkaSSLProperties sslProperties;
 
     /**
+     * ObjectMapper 설정
+     * - LocalDateTime을 ISO-8601 형식으로 직렬화
+     */
+    @Bean
+    public ObjectMapper kafkaObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        // JavaTimeModule 등록 (LocalDateTime 등 Java 8 Time API 지원)
+        mapper.registerModule(new JavaTimeModule());
+        // LocalDateTime을 배열이 아닌 ISO-8601 문자열로 직렬화
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return mapper;
+    }
+
+    /**
      * Producer Factory 설정
      * - Key: String
      * - Value: Object (모든 타입 지원)
      */
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
         Properties props = buildProducerProperties();
-        return new DefaultKafkaProducerFactory<>(props.entrySet().stream()
-                .collect(java.util.stream.Collectors.toMap(
-                        e -> e.getKey().toString(),
-                        e -> e.getValue()
-                )));
+
+        props.forEach((key, value) -> configProps.put(key.toString(), value));
+
+        // JsonSerializer에 ObjectMapper 설정
+        JsonSerializer<Object> jsonSerializer = new JsonSerializer<>(kafkaObjectMapper());
+        jsonSerializer.setAddTypeInfo(false);  // Type 헤더 비활성화
+
+        return new DefaultKafkaProducerFactory<>(
+                configProps,
+                new StringSerializer(),
+                jsonSerializer
+        );
     }
 
     /**

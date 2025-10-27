@@ -20,6 +20,7 @@ public class Order {
 
     private String orderId;
     private String customerId;
+    private String productId;       // 상품 ID (추가)
     private String productName;
     private Integer quantity;
     private BigDecimal price;
